@@ -3084,7 +3084,7 @@ function vbFind(q,q2,hint,C){let best=null,bs=0;(C||vbCands()).forEach(m=>{let s
 function vbGiverSide(m,name){const h=vbTeamScore(name,m.home),a=vbTeamScore(name,m.away);return h>=a?"home":"away"}
 function vbLine(t){return String(t||"").replace(/[()]/g,"").replace(/[−–—]/g,"-").trim()}
 /* body token: optional H/A before or after; goal token */
-const VB_B="(?:(?<![A-Za-z])[HhAa]\\s*)?(?:[=\\d][\\d=+\\-]*|[+\\-]\\d+)(?:\\s*[HhAa](?![a-z]))?",VB_G="\\(?[=\\d][\\d=+\\-]*\\)?";
+const VB_B="(?:\\b[HhAa]\\s*)?(?:[=\\d][\\d=+\\-]*|[+\\-]\\d+)(?:\\s*[HhAa](?![a-z]))?",VB_G="\\(?[=\\d][\\d=+\\-]*\\)?";
 const VB_LN=new RegExp("("+VB_B+")\\s*[/|]\\s*("+VB_G+")");
 const VB_SP=new RegExp("^(.+?)\\s+("+VB_B+")\\s+("+VB_G+")$");
 const VB_ONE=new RegExp("^(.+?)\\s+("+VB_B+")$");
