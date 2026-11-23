@@ -1022,11 +1022,11 @@ function fbAdapter(fs){return {collection:c=>({doc:id=>({set:data=>fs.collection
   onSnapshot:(ok,no)=>fs.collection(c).onSnapshot({includeMetadataChanges:true},snap=>ok({docs:snap.docs.map(d=>({id:d.id,data:()=>fbDec(d)})),metadata:snap.metadata}),no)})}}
 function fbLoginForm(msg){
   showStoreNote(`<form id="fbLogin" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;width:100%"><b>🔐 Login ဝင်ပါ</b>
-  <input type="email" id="fbEm" placeholder="Email" autocomplete="username" required style="flex:1;min-width:180px">
-  <input type="password" id="fbPw" placeholder="Password" autocomplete="current-password" required style="flex:1;min-width:140px">
+  <input type="email" id="fbEm" placeholder="Email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required style="flex:1;min-width:180px">
+  <input type="password" id="fbPw" placeholder="Password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" required style="flex:1;min-width:140px"><button type="button" class="ghost" id="fbEye" title="Password ပြ/ဖျောက်">👁</button>
   <button class="primary" type="submit">ဝင်မည်</button>${msg?`<span class="small neg" style="width:100%">${esc(msg)}</span>`:""}</form>`,true);
-  const f=$("#fbLogin");f.addEventListener("submit",async e=>{e.preventDefault();const b=f.querySelector("button");b.disabled=true;b.textContent="ဝင်နေပါတယ်…";
-    try{await firebase.auth().signInWithEmailAndPassword($("#fbEm").value.trim(),$("#fbPw").value)}
+  const f=$("#fbLogin");const b0=f.querySelector("button.primary");$("#fbEye").addEventListener("click",()=>{const i=$("#fbPw");i.type=i.type==="password"?"text":"password"});f.addEventListener("submit",async e=>{e.preventDefault();const b=b0;b.disabled=true;b.textContent="ဝင်နေပါတယ်…";
+    try{await firebase.auth().signInWithEmailAndPassword($("#fbEm").value.trim().toLowerCase(),$("#fbPw").value)}
     catch(err){const c=err&&err.code||"";fbLoginForm(/wrong-password|invalid-credential|user-not-found|invalid-email/.test(c)?"Email (သို့) Password မှားနေပါတယ်":/network/.test(c)?"လိုင်းမရပါ — ပြန်စမ်းပါ":/unauthorized-domain/.test(c)?"ဒီ Domain ကို Firebase Authorized domains ထဲ မထည့်ရသေးပါ":"ဝင်မရပါ ("+c+")")}});
 }
 let fbStarted=false;
