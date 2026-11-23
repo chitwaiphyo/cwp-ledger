@@ -446,7 +446,7 @@ section.view svg{max-width:100%;height:auto}
     <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် အလိုလို ဝင်)</span><span class="box-arrow" aria-hidden="true"></span></summary>
     <div class="box-body" style="display:grid;gap:10px">
       <textarea id="vbText" rows="6" placeholder="Yar Win Soe ဆီက Viber စာကို ဒီမှာ Paste ချပါ&#10;ဥပမာ:&#10;9:45&#10;Racing vs Sociedad&#10;Sociedad -80/3-90&#10;Bilbao vs Espanyol Bilbao 1-30/3+20&#10;Change A Villa 1+50/3+40 Spur 1-10/3-20&#10;Hull vs Brighton 1(-32)A 3(50)u"></textarea>
-      <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
+      <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><button type="button" class="ghost" id="rsCopy" title="ရလဒ် မထည့်ရသေးတဲ့ ကန်ပြီးပွဲတွေကို ChatGPT အတွက် Copy ကူး">📤 ရလဒ်လိုတဲ့ပွဲ Copy</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
       <div id="vbPrev"></div>
     </div></details>
     <div class="seg scope-seg" id="mvScope" hidden role="group" aria-label="ပွဲစဉ် အုပ်စု"><button type="button" data-sc="main" aria-pressed="true">⭐ Main ပွဲစဉ် <span class="sc-n" id="scMain"></span></button><button type="button" data-sc="other" aria-pressed="false">အခြား <span class="sc-n" id="scOther"></span></button></div>
@@ -3176,6 +3176,13 @@ function vbRender(){const el=$("#vbPrev");if(!VB.length){el.innerHTML='<p class=
   VB.forEach((x,i)=>{const s=el.querySelector(`[data-vbm="${i}"]`);if(s&&x.m)s.value=x.m.id})}
 $("#vbCheck").addEventListener("click",()=>{if(isRes()){VB=rsParse($("#vbText").value);rsRender();return}VB=vbParse($("#vbText").value);vbRender()});
 $("#vbTarget").addEventListener("change",()=>{$("#vbPrev").innerHTML="";if(!$("#vbText").value.trim()){VB=[];return}if(isRes()){VB=rsParse($("#vbText").value);rsRender()}else{VB=vbParse($("#vbText").value);vbRender()}});
+$("#rsCopy").addEventListener("click",async()=>{const now=Date.now();
+  const L=rsCands().filter(m=>(m.hg==null||m.hg==="")&&kickTs(m)<now-115*60e3).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  if(!L.length){toast("ရလဒ် လိုတဲ့ ကန်ပြီးပွဲ မရှိပါ");return}
+  const t="results\n"+L.map(m=>`${m.home} vs ${m.away} (${ddmm(m.date)} ${m.time||""} Myanmar time, ${m.league||""})`).join("\n");
+  let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(e){}
+  if(!ok){$("#vbText").value=t;$("#vbText").select();try{ok=document.execCommand("copy")}catch(e){}}
+  toast(ok?`${L.length} ပွဲ Copy ကူးပြီး — ChatGPT မှာ Paste ချပါ`:"Copy မရပါ — အကွက်ထဲက စာကို ကိုယ်တိုင် ကူးပါ")});
 $("#vbClear").addEventListener("click",()=>{$("#vbText").value="";VB=[];$("#vbPrev").innerHTML=""});
 $("#vbPrev").addEventListener("change",e=>{const s=e.target.closest("[data-vbm]");if(!s)return;const x=VB[+s.dataset.vbm];if(isRes()){x.m=S.matches.find(m=>m.id===s.value)||null;x.ok=!!x.m;rsRender();return}x.m=S.matches.find(m=>m.id===s.value)||null;x.side=x.m?(x.forceSide||(x.giver?vbGiverSide(x.m,x.giver):"home")):null;x.ok=!!x.m&&x.b!=null&&x.b!==""&&x.g!=null;vbRender()});
 $("#vbPrev").addEventListener("click",async e=>{if(!e.target.closest("#vbApply"))return;if(isRes())return rsApply();const Y=ywsId();let n=0;
