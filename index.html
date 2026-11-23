@@ -3288,6 +3288,7 @@ function vbRender(){const el=$("#vbPrev");if(!VB.length){el.innerHTML='<p class=
 function vbAutoTarget(){const ta=$("#vbText");const ls=ta.value.split(/\r?\n/);let y=0,n=0;
   const out=ls.map(l=>{const r=l.match(/^\s*(NET|Internet|108sode|iBet|YWS|Yar(?:\s*Win\s*Soe)?)\s*[:|\-]?\s+(?=\d{1,2}[:.]\d{2}|\D)/i);if(!r)return l;
     if(/^(yws|yar)/i.test(r[1]))y++;else n++;return l.slice(r[0].length)});
+  if(!y&&!n&&/close\s*time/i.test(ta.value)){const sel=$("#vbTarget");if(sel.value==="net"){sel.value="yws";try{localStorage.setItem("kyay-vbtgt","yws")}catch(e){}}return}
   if(!y&&!n)return;const sel=$("#vbTarget");if(sel.value!=="bet"&&sel.value!=="res"){sel.value=n>y?"net":"yws";try{localStorage.setItem("kyay-vbtgt",sel.value)}catch(e){}}
   if(!/^(bet)$/.test(sel.value))ta.value=out.join("\n")}
 try{const t=localStorage.getItem("kyay-vbtgt");if(t&&$("#vbTarget").querySelector(`option[value="${t}"]`))$("#vbTarget").value=t}catch(e){}
