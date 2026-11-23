@@ -3203,10 +3203,14 @@ function btParse(text){const out=[];const C=btCands();
     const pk=f[2].toLowerCase().replace(/^g\s*/,"").trim();
     x.mk=/^(over|o|ပေါ်|ဂိုးပေါ်|gover)$/.test(pk)?"goal":/^(under|u|အောက်|ဂိုးအောက်|gunder)$/.test(pk)?"goal":"body";
     if(x.mk==="goal")x.pick=/^(over|o|ပေါ်|ဂိုးပေါ်|gover)$/.test(pk)?"over":"under";
-    const ln=f[3].replace(/^(?:ဂိုး|goal|g)\s*/i,"").trim();const lm=ln.match(/^(.*?)\s*((?:\d+(?:\.\d+)?)?\s*[+\-=]\s*\d{0,3})$/);
-    const l=lm?pml(lm[2]):null;if(!l&&!x.err)x.err="ကြေး မဖတ်နိုင်";
+    const ln=f[3].replace(/^(?:ဂိုး|goal|g)\s*/i,"").trim();
+    if((!ln||ln==="-")&&x.m&&x.d){const q=qbSrc(x.m,x.d.id);const pl=parseLine(q&&q.text,x.m.home,x.m.away);const P=x.mk==="body"?pl.body:pl.goal;
+      if(!P){if(!x.err)x.err="App ထဲ ကြေး မရှိ"}else{x.ball=P.ball;x.price=P.price;if(x.mk==="body")x.giver=P.giver;x.auto=1}}
+    const lm=x.auto?null:ln.match(/^(.*?)\s*((?:\d+(?:\.\d+)?)?\s*[+\-=]\s*\d{0,3})$/);
+    const l=lm?pml(lm[2]):null;if(!x.auto&&!l&&!x.err)x.err="ကြေး မဖတ်နိုင်";
     if(l){x.ball=l.ball;x.price=l.price}
-    if(x.m&&x.mk==="body"){const ph=vbTeamScore(f[2],x.m.home),pa=vbTeamScore(f[2],x.m.away);if(!ph&&!pa){if(!x.err)x.err="ထိုးဘက် မသိ"}else x.pick=ph>=pa?"home":"away";
+    if(x.m&&x.mk==="body"&&x.auto){const ph=vbTeamScore(f[2],x.m.home),pa=vbTeamScore(f[2],x.m.away);if(!ph&&!pa){if(!x.err)x.err="ထိုးဘက် မသိ"}else x.pick=ph>=pa?"home":"away"}
+    else if(x.m&&x.mk==="body"){const ph=vbTeamScore(f[2],x.m.home),pa=vbTeamScore(f[2],x.m.away);if(!ph&&!pa){if(!x.err)x.err="ထိုးဘက် မသိ"}else x.pick=ph>=pa?"home":"away";
       const gn=lm?lm[1].trim():"";const gh=vbTeamScore(gn,x.m.home),ga=vbTeamScore(gn,x.m.away);if(!gn||(!gh&&!ga)){if(!x.err)x.err="ကြေးပေး အသင်း မသိ"}else x.giver=gh>=ga?"home":"away"}
     x.u=parseFloat(String(f[4]).replace(/[, ]|u$/gi,""));if(!(x.u>0)&&!x.err)x.err="ထိုးကြေး မဖတ်နိုင်";
     const lv=(f[5]||"").match(/(\d+)\s*[-:]\s*(\d+)/);if(lv&&/live|ပွဲတွင်း|^\s*\d/i.test(f[5])){x.live=true;x.lh=+lv[1];x.la=+lv[2]}
@@ -3220,7 +3224,7 @@ function btRender(){const el=$("#vbPrev");if(!VB.length){el.innerHTML='<p class=
   let tot=0;el.innerHTML=`<table class="mini hedge" style="width:100%"><thead><tr><th>ဒိုင်</th><th>ပွဲ</th><th>ထိုး</th><th>ကြေး</th><th>ထိုးကြေး</th><th></th></tr></thead><tbody>${VB.map((x,i)=>{const b=x.ok?btBet(x):null;
     return `<tr><td>${x.d?esc(x.d.name):'<span class="chip loss">?</span>'}</td><td>${x.m?`${esc(ddmm(x.m.date))} ${esc(x.m.time||"")} ${esc(x.m.home)} – ${esc(x.m.away)}`:""}<br><select data-vbm="${i}" style="width:auto;max-width:100%;padding:3px 6px;margin-top:3px"><option value="">— ပွဲ ရွေးရန် —</option>${opts}</select><div class="small muted">${esc(x.raw)}</div></td>
       <td>${b?pickHtml(b)+(x.live?` <span class="chip">Live ${x.lh}-${x.la}</span>`:""):`<span class="chip loss">${esc(x.err)}</span>`}</td>
-      <td class="num">${b?(x.mk==="body"?esc((x.giver==="home"?x.m.home:x.m.away)+" "):"ဂိုး ")+esc(fmtML(x.ball,x.price)):""}</td>
+      <td class="num">${x.auto?'<span class="chip">App ကြေး</span> ':""}${b?(x.mk==="body"?esc((x.giver==="home"?x.m.home:x.m.away)+" "):"ဂိုး ")+esc(fmtML(x.ball,x.price)):""}</td>
       <td class="num"><b>${x.u>0?x.u:""}</b>${x.d&&isUnitD(x.d)?" U":""}${x.dup?'<br><span class="chip ex">ရှိပြီး</span>':""}</td>
       <td><input type="checkbox" data-vbon="${i}" ${x.ok&&!x.dup?"checked":""} ${x.ok?"":"disabled"}></td></tr>`}).join("")}</tbody></table>
     <div class="row" style="margin-top:8px"><button type="button" class="primary" id="vbApply">✓ ရွေးထားတာ ထိုးစာရင်း သွင်းမည်</button><span class="small muted">${VB.filter(x=>x.ok).length}/${VB.length} ကြောင်း ဖတ်ရ · "ရှိပြီး" = ဒိုင်·ပွဲ·ဘက်·ကြေး·ပမာဏ တူတာ App ထဲ ရှိပြီး</span></div>`;
