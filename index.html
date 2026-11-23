@@ -3192,20 +3192,29 @@ function btDealer(t){const k=String(t||"").toLowerCase().replace(/[^a-z0-9]/g,""
   const nm=d=>d.name.toLowerCase().replace(/[^a-z0-9]/g,"");const L=S.dealers.filter(d=>!d.example);
   const f=x=>L.find(d=>nm(d)===x)||L.find(d=>nm(d).endsWith(x))||L.find(d=>x.length>2&&nm(d).includes(x));
   return f(k)||f(k.replace(/^\d+/,""))||f(k.replace(/^(ibet|acc|ibetacc)/,""))||null}
+function btFind1(q,C){const now=Date.now();let best=null,bs=0,bk=0;C.forEach(m=>{const sc=Math.max(vbTeamScore(q,m.home),vbTeamScore(q,m.away));if(!sc)return;
+    const k=kickTs(m)||now;const fin=m.hg!=null&&m.hg!=="";const pr=(fin?0:2)+(k>now-3*3600e3?1:0);const sc2=sc*10+pr;
+    if(sc2>bs||(sc2===bs&&Math.abs(k-now)<Math.abs(bk-now))){best=m;bs=sc2;bk=k}});return best}
+const BT_G=/^(g\s*[+\-]|g\s*(?:over|under)|ဂိုး\s*(?:ပေါ်|အောက်)|ပေါ်|အောက်|over|under)$/i;
+const btOU=t=>/(\+|over|ပေါ်)/i.test(t)?"over":"under";
 function btParse(text){const out=[];const C=btCands();
   String(text||"").split(/\r?\n/).forEach(raw=>{let L=String(raw||"").replace(/[၀-၉]/g,c=>String(c.charCodeAt(0)-0x1040)).replace(/[−–—]/g,"-").replace(/ /g," ").trim();
-    L=L.replace(/^\s*(?:\d{1,2}[.)]\s+|[-•*►➤▪●◆]+\s*)/u,"");if(!L||!L.includes("|"))return;
+    L=L.replace(/^\s*(?:\d{1,2}[.)]\s+|[-•*►➤▪●◆]+\s*)/u,"");if(!L)return;
+    if(!L.includes("|")){const r=L.match(/^(.+?)\s+(?:(g\s*[+\-]|g\s*(?:over|under)|ဂိုး\s*(?:ပေါ်|အောက်)|ပေါ်|အောက်|over|under)\s+)?([\d,]+(?:\.\d+)?)\s*(?:u|unit|units)?$/i);if(!r)return;
+      L=`YWS | ${r[1].trim()} | ${r[2]?(btOU(r[2])==="over"?"Over":"Under"):r[1].trim()} |  | ${r[3].replace(/,/g,"")}`}
+    if(!L.includes("|"))return;
     const f=L.split("|").map(x=>x.trim());if(f.length<5)return;
     const x={raw:L,ok:false,err:""};x.d=btDealer(f[0]);if(!x.d)x.err="ဒိုင် မသိ";
     let mt=f[1],hint=null;const tm=mt.match(/^(\d{1,2})[:.](\d{2})\s+(.*)$/);if(tm){hint=tm[1].padStart(2,"0")+":"+tm[2];mt=tm[3]}
     const vs=mt.replace(/\s*\.?\s*\b(?:vs|v|VS|Vs)\b\.?\s*/," vs ").split(" vs ");
-    x.m=vs.length===2?vbFind(vs[0].trim(),vs[1].trim(),hint,C):null;if(!x.m&&!x.err)x.err="ပွဲ မတွေ့";
+    x.m=vs.length===2?vbFind(vs[0].trim(),vs[1].trim(),hint,C):btFind1(mt.trim(),C);if(!x.m&&!x.err)x.err="ပွဲ မတွေ့";
+    if(BT_G.test(f[2].trim()))f[2]=btOU(f[2])==="over"?"Over":"Under";
     const pk=f[2].toLowerCase().replace(/^g\s*/,"").trim();
     x.mk=/^(over|o|ပေါ်|ဂိုးပေါ်|gover)$/.test(pk)?"goal":/^(under|u|အောက်|ဂိုးအောက်|gunder)$/.test(pk)?"goal":"body";
     if(x.mk==="goal")x.pick=/^(over|o|ပေါ်|ဂိုးပေါ်|gover)$/.test(pk)?"over":"under";
     const ln=f[3].replace(/^(?:ဂိုး|goal|g)\s*/i,"").trim();
     if((!ln||ln==="-")&&x.m&&x.d){const q=qbSrc(x.m,x.d.id);const pl=parseLine(q&&q.text,x.m.home,x.m.away);const P=x.mk==="body"?pl.body:pl.goal;
-      if(!P){if(!x.err)x.err="App ထဲ ကြေး မရှိ"}else{x.ball=P.ball;x.price=P.price;if(x.mk==="body")x.giver=P.giver;x.auto=1}}
+      if(!P){if(!x.err)x.err="App ထဲ ကြေး မရှိ"}else{x.ball=P.ball;x.price=P.price;if(x.mk==="body")x.giver=P.giver;x.auto=q.src==="net"?2:1}}
     const lm=x.auto?null:ln.match(/^(.*?)\s*((?:\d+(?:\.\d+)?)?\s*[+\-=]\s*\d{0,3})$/);
     const l=lm?pml(lm[2]):null;if(!x.auto&&!l&&!x.err)x.err="ကြေး မဖတ်နိုင်";
     if(l){x.ball=l.ball;x.price=l.price}
@@ -3224,7 +3233,7 @@ function btRender(){const el=$("#vbPrev");if(!VB.length){el.innerHTML='<p class=
   let tot=0;el.innerHTML=`<table class="mini hedge" style="width:100%"><thead><tr><th>ဒိုင်</th><th>ပွဲ</th><th>ထိုး</th><th>ကြေး</th><th>ထိုးကြေး</th><th></th></tr></thead><tbody>${VB.map((x,i)=>{const b=x.ok?btBet(x):null;
     return `<tr><td>${x.d?esc(x.d.name):'<span class="chip loss">?</span>'}</td><td>${x.m?`${esc(ddmm(x.m.date))} ${esc(x.m.time||"")} ${esc(x.m.home)} – ${esc(x.m.away)}`:""}<br><select data-vbm="${i}" style="width:auto;max-width:100%;padding:3px 6px;margin-top:3px"><option value="">— ပွဲ ရွေးရန် —</option>${opts}</select><div class="small muted">${esc(x.raw)}</div></td>
       <td>${b?pickHtml(b)+(x.live?` <span class="chip">Live ${x.lh}-${x.la}</span>`:""):`<span class="chip loss">${esc(x.err)}</span>`}</td>
-      <td class="num">${x.auto?'<span class="chip">App ကြေး</span> ':""}${b?(x.mk==="body"?esc((x.giver==="home"?x.m.home:x.m.away)+" "):"ဂိုး ")+esc(fmtML(x.ball,x.price)):""}</td>
+      <td class="num">${x.auto===2?'<span class="chip loss" title="ဒီဒိုင်ကြေး မထည့်ရသေးလို့ Internet ကြေးကို ယူထား">Internet ကြေး ⚠</span> ':x.auto?'<span class="chip">App ကြေး</span> ':""}${b?(x.mk==="body"?esc((x.giver==="home"?x.m.home:x.m.away)+" "):"ဂိုး ")+esc(fmtML(x.ball,x.price)):""}</td>
       <td class="num"><b>${x.u>0?x.u:""}</b>${x.d&&isUnitD(x.d)?" U":""}${x.dup?'<br><span class="chip ex">ရှိပြီး</span>':""}</td>
       <td><input type="checkbox" data-vbon="${i}" ${x.ok&&!x.dup?"checked":""} ${x.ok?"":"disabled"}></td></tr>`}).join("")}</tbody></table>
     <div class="row" style="margin-top:8px"><button type="button" class="primary" id="vbApply">✓ ရွေးထားတာ ထိုးစာရင်း သွင်းမည်</button><span class="small muted">${VB.filter(x=>x.ok).length}/${VB.length} ကြောင်း ဖတ်ရ · "ရှိပြီး" = ဒိုင်·ပွဲ·ဘက်·ကြေး·ပမာဏ တူတာ App ထဲ ရှိပြီး</span></div>`;
