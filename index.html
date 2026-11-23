@@ -155,6 +155,51 @@ button:disabled{opacity:.5;cursor:not-allowed}
   #matchList .score-in input{width:38px}
   #matchList .qb{position:static;max-width:none}
 }
+@media (max-width:900px){
+  #matchList .mtable tr.mrow:not(.sub){display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-areas:"da tm lg lg st st" "ho ho rs rs aw aw" "bo bo bo go go go" "yw yw yw yw yw yw" "bt bt ac ac ac ac";gap:6px 4px;padding:10px 6px;align-items:center}
+  #matchList .mtable tr.mrow:not(.sub)>td{width:auto!important;margin:0!important;padding:0 2px}
+  #matchList .k-date{grid-area:da}#matchList .k-time{grid-area:tm}
+  #matchList .k-lg{grid-area:lg;text-align:center;overflow:hidden;white-space:nowrap!important;text-overflow:ellipsis}
+  #matchList .k-st{grid-area:st;text-align:right!important;justify-self:end}
+  #matchList .k-home{grid-area:ho;text-align:right!important;font-size:15px;font-weight:600;overflow-wrap:anywhere}
+  #matchList .k-res{grid-area:rs;justify-self:center}
+  #matchList .k-away{grid-area:aw;text-align:left!important;font-size:15px;font-weight:600;overflow-wrap:anywhere}
+  #matchList .k-away .ell,#matchList .k-home .small{display:none}
+  #matchList .k-body{grid-area:bo}#matchList .k-goal{grid-area:go}
+  #matchList .k-body,#matchList .k-goal{display:flex!important;flex-wrap:wrap;align-items:center;justify-content:center;gap:2px 6px}
+  #matchList .k-body .k-lab::before{content:"Internet "}
+  #matchList .k-body .flq-b,#matchList .k-goal .flq-g{flex-basis:100%;text-align:center}
+  #matchList .k-yws{grid-area:yw;justify-content:center}
+  #matchList .k-bets{grid-area:bt;justify-self:start}
+  #matchList .k-act{grid-area:ac;justify-self:end}
+  #matchList .k-act .acts{flex-wrap:nowrap}
+  #matchList .ahaIn input,#matchList .netIn input{width:72px}
+  #matchList .score-in{display:inline-flex;align-items:center;gap:3px}
+  #matchList .score-in input{width:36px}
+  #matchList .score{font-size:18px}
+}
+@media (max-width:700px){
+  #recBody{overflow:visible}
+  #recBody table,#recBody tbody{display:block;width:100%;min-width:0}
+  #recBody thead{display:none}
+  #recBody tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;padding:10px 4px;border-bottom:1px solid var(--line)}
+  #recBody td{display:block;border:0;padding:0;min-width:0;white-space:normal;text-align:left}
+  #recBody td:first-child{grid-column:1/-1}
+  #recBody td[colspan]{grid-column:1/-1}
+  #recBody td[data-l]::before{content:attr(data-l);display:block;font-size:11px;color:var(--muted);font-weight:400}
+  #recBody td:last-child{grid-column:1/-1;justify-self:end}
+  #recBody input[data-recv]{width:120px!important}
+}
+@media (max-width:700px){
+  #perOut .tbl-wrap{overflow-x:auto!important;max-width:100%;-webkit-overflow-scrolling:touch}
+  #perOut,#v-statement .panel:has(#perOut){min-width:0;max-width:100%}
+  #perOut table.per{min-width:0!important;width:max-content!important;max-width:none!important;table-layout:auto!important;font-size:12.5px}
+  #perOut table.per th,#perOut table.per td{white-space:nowrap!important;overflow-wrap:normal!important;overflow:visible!important;width:auto!important;padding:6px 8px}
+  #perOut table.per col{width:auto!important}
+  #perOut table.per td:first-child,#perOut table.per th:first-child{position:sticky;left:0;background:var(--surface);z-index:1}
+  #perOut table.per tr.dayhead td:first-child{background:var(--accent-soft)}
+  #perOut table.per .big{font-size:16px!important}
+}
 .lh{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:13px;align-items:center}.lh-i{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center}.lh-d{color:var(--accent)}tr.lhrow td{background:transparent!important;padding-top:0!important;border-top:0!important}
 .qb-st.on{background:var(--accent-soft);border-color:var(--accent)}.qb-ex{display:grid;gap:2px;border-top:1px dashed var(--line);padding-top:6px}
 .qb-calc{display:flex;flex-wrap:wrap;gap:4px 14px}.qb-p.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
@@ -2247,9 +2292,9 @@ function renderRec(){
     const perBet=!u&&!a;if(perBet&&!done){missing--;}
     const diff=real!=null?real-soft:null;const cv=v=>u?fmtU(v/d.unitValue)+`<br><span class="small muted">${fmtS(v)}</span>`:fmtS(v);
     return `<tr data-rec="${esc(id)}"><td><b>${esc(d.name)}</b><br><span class="small muted">${bs.length?bs.length+" ပွဲ":"app ထဲ ပွဲမှတ်တမ်း မရှိ"}${pend?` · <span class="neg">ရလဒ်မထည့်ရသေး ${pend}</span><br><span class="small">ဒိုင်စာရင်း ထည့်ရင် ပေါင်းထဲ ပါသွားမယ်</span>`:""}${viaDay?` · <span class="chip adj">ရလဒ်မပါဘဲ ပေါင်းထဲ ${viaDay}</span>`:""}</span></td>
-      <td class="num ${cls(soft)}">${cv(soft)}</td>
-      ${perBet?`<td colspan="3" class="small muted">ပွဲအလိုက် ရှင်း (ပေါင်း/နှုတ် မလို)</td></tr>`:`<td><div class="row" style="gap:4px;flex-wrap:nowrap"><input type="number" step="${u?"0.01":"1"}" data-recv placeholder="${u?"Unit":"ကျပ်"}" value="${real!=null?(u?(a.actualUnits!=null?+a.actualUnits:+(real/d.unitValue).toFixed(2)):real):""}" style="width:100px"><span class="small muted">${u?"U":"Ks"}</span></div></td>
-      <td class="num ${diff!=null?cls(diff):""}">${diff==null?'<span class="muted small">—</span>':Math.abs(diff)<0.5?'<span class="chip win">ကိုက်</span>':cv(diff)}</td>
+      <td class="num ${cls(soft)}" data-l="Software">${cv(soft)}</td>
+      ${perBet?`<td colspan="3" class="small muted">ပွဲအလိုက် ရှင်း (ပေါင်း/နှုတ် မလို)</td></tr>`:`<td data-l="ဒိုင်စာရင်း"><div class="row" style="gap:4px;flex-wrap:nowrap"><input type="number" step="${u?"0.01":"1"}" data-recv placeholder="${u?"Unit":"ကျပ်"}" value="${real!=null?(u?(a.actualUnits!=null?+a.actualUnits:+(real/d.unitValue).toFixed(2)):real):""}" style="width:100px"><span class="small muted">${u?"U":"Ks"}</span></div></td>
+      <td class="num ${diff!=null?cls(diff):""}" data-l="ကွာ">${diff==null?'<span class="muted small">—</span>':Math.abs(diff)<0.5?'<span class="chip win">ကိုက်</span>':cv(diff)}</td>
       <td>${a&&a.clearedId?'<span class="chip ex">ရှင်းပြီး</span>':`<div class="row" style="gap:4px;flex-wrap:nowrap"><button type="button" class="primary small" data-recok>သိမ်း</button>${a?'<button type="button" class="ghost small" data-recrm>ဖျက်</button>':""}</div>`}</td></tr>`}`}).join("");
   el.innerHTML=`<table><thead><tr><th>ဒိုင်</th><th>Software</th><th>ဒိုင်စာရင်း</th><th>ကွာ</th><th></th></tr></thead><tbody>${rows}
     ${rows.trim()?"":`<tr><td colspan="5" class="small muted">ဒီရက် ရှင်းပြီးသား — ရှင်းပြီး မှတ်တမ်းထဲမှာ ကြည့်ပါ</td></tr>`}
