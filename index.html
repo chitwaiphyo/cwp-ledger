@@ -454,7 +454,7 @@ section.view svg{max-width:100%;height:auto}
     <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် အလိုလို ဝင်)</span><span class="box-arrow" aria-hidden="true"></span></summary>
     <div class="box-body" style="display:grid;gap:10px">
       <textarea id="vbText" rows="6" placeholder="Yar Win Soe ဆီက Viber စာကို ဒီမှာ Paste ချပါ&#10;ဥပမာ:&#10;9:45&#10;Racing vs Sociedad&#10;Sociedad -80/3-90&#10;Bilbao vs Espanyol Bilbao 1-30/3+20&#10;Change A Villa 1+50/3+40 Spur 1-10/3-20&#10;Hull vs Brighton 1(-32)A 3(50)u"></textarea>
-      <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><button type="button" class="ghost" id="rsCopy" title="ရလဒ် မထည့်ရသေးတဲ့ ကန်ပြီးပွဲတွေကို ChatGPT အတွက် Copy ကူး">📤 ရလဒ်လိုတဲ့ပွဲ Copy</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
+      <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><label class="chk small" title="ကြေး/ရလဒ် မထည့်မိခဲ့တဲ့ ရက်ဟောင်းပွဲတွေပါ ရှာမယ်"><input type="checkbox" id="vbOld"> ရက် ၃၀ အတွင်း ပွဲဟောင်းပါ</label><button type="button" class="ghost" id="rsCopy" title="ရလဒ် မထည့်ရသေးတဲ့ ကန်ပြီးပွဲတွေကို ChatGPT အတွက် Copy ကူး">📤 ရလဒ်လိုတဲ့ပွဲ Copy</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
       <div id="vbPrev"></div>
     </div></details>
     <div class="seg scope-seg" id="mvScope" hidden role="group" aria-label="ပွဲစဉ် အုပ်စု"><button type="button" data-sc="main" aria-pressed="true">⭐ Main ပွဲစဉ် <span class="sc-n" id="scMain"></span></button><button type="button" data-sc="other" aria-pressed="false">အခြား <span class="sc-n" id="scOther"></span></button></div>
@@ -3075,7 +3075,8 @@ function vbTeamScore(q,team){const a=vbN(q),b=vbN(team);if(!a||!b)return 0;const
   if(a.length>=4&&(b.includes(a)||a.includes(b)))return 6;
   if(a.length>=4&&b.replace(/ /g,"").startsWith(a.replace(/ /g,"").slice(0,4)))return 4;
   return 0}
-function vbCands(){const now=Date.now();return S.matches.filter(m=>(m.hg==null||m.hg==="")&&(()=>{const k=kickTs(m);return k==null||(k>now-3*3600e3&&k<now+48*3600e3)})())}
+const vbOld=()=>{const c=$("#vbOld");return !!(c&&c.checked)};
+function vbCands(){const now=Date.now();if(vbOld())return S.matches.filter(m=>{const k=kickTs(m);return k==null||(k>now-31*864e5&&k<now+48*3600e3)});return S.matches.filter(m=>(m.hg==null||m.hg==="")&&(()=>{const k=kickTs(m);return k==null||(k>now-3*3600e3&&k<now+48*3600e3)})())}
 function vbFind(q,q2,hint,C){let best=null,bs=0;(C||vbCands()).forEach(m=>{let sc,side;
     if(q2!=null){const s1=vbTeamScore(q,m.home)+vbTeamScore(q2,m.away),s2=vbTeamScore(q,m.away)+vbTeamScore(q2,m.home);sc=Math.max(s1,s2);if(vbTeamScore(q,m.home)<3||vbTeamScore(q2,m.away)<3)sc=Math.min(sc,s2>=6?s2:0)}
     else{const h=vbTeamScore(q,m.home),a=vbTeamScore(q,m.away);sc=Math.max(h,a)}
@@ -3140,7 +3141,7 @@ let VB=[];
 
 /* ---- ပွဲပြီး ရလဒ် paste ---- */
 const isRes=()=>$("#vbTarget").value==="res";
-function rsCands(){const now=Date.now();return S.matches.filter(m=>{const k=kickTs(m);return k!=null&&k<now+30*60e3&&k>now-8*864e5})}
+function rsCands(){const now=Date.now(),d=vbOld()?31:8;return S.matches.filter(m=>{const k=kickTs(m);return k!=null&&k<now+30*60e3&&k>now-d*864e5})}
 function rsParse(text){const out=[];let hint=null;const C=rsCands();
   String(text||"").split(/\r?\n|;/).forEach(raw=>{let L=String(raw||"").replace(/[၀-၉]/g,c=>String(c.charCodeAt(0)-0x1040)).replace(/[−–—]/g,"-").replace(/ /g," ");
     L=L.replace(/\([^)]*\)|\[[^\]]*\]/g," ").replace(/\b(?:FT|AET|AP|HT|Full ?time|ပြီး)\b\.?/gi," ");
@@ -3183,6 +3184,7 @@ function vbRender(){const el=$("#vbPrev");if(!VB.length){el.innerHTML='<p class=
     <div class="row" style="margin-top:8px"><button type="button" class="primary" id="vbApply">✓ ရွေးထားတာ ထည့်မည်</button><span class="small muted">${VB.filter(x=>x.ok).length}/${VB.length} ပွဲ ကိုက်</span></div>`;
   VB.forEach((x,i)=>{const s=el.querySelector(`[data-vbm="${i}"]`);if(s&&x.m)s.value=x.m.id})}
 $("#vbCheck").addEventListener("click",()=>{if(isRes()){VB=rsParse($("#vbText").value);rsRender();return}VB=vbParse($("#vbText").value);vbRender()});
+$("#vbOld").addEventListener("change",()=>$("#vbTarget").dispatchEvent(new Event("change")));
 $("#vbTarget").addEventListener("change",()=>{$("#vbPrev").innerHTML="";if(!$("#vbText").value.trim()){VB=[];return}if(isRes()){VB=rsParse($("#vbText").value);rsRender()}else{VB=vbParse($("#vbText").value);vbRender()}});
 $("#rsCopy").addEventListener("click",async()=>{const now=Date.now();
   const L=rsCands().filter(m=>(m.hg==null||m.hg==="")&&kickTs(m)<now-115*60e3).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
