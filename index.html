@@ -200,6 +200,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
   #perOut table.per tr.dayhead td:first-child{background:var(--accent-soft)}
   #perOut table.per .big{font-size:16px!important}
 }
+.chip.warn{background:#fff1c2;color:#7a5300;border-color:#f0d27a}
 .lh{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:13px;align-items:center}.lh-i{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center}.lh-d{color:var(--accent)}tr.lhrow td{background:transparent!important;padding-top:0!important;border-top:0!important}
 .qb-st.on{background:var(--accent-soft);border-color:var(--accent)}.qb-ex{display:grid;gap:2px;border-top:1px dashed var(--line);padding-top:6px}
 .qb-calc{display:flex;flex-wrap:wrap;gap:4px 14px}.qb-p.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
@@ -3195,6 +3196,8 @@ function vbParse(text){const out=[];let hint=null,pair=null;
     const nw=!m&&!!x.home&&!!x.away&&!!x.date;
     return Object.assign(x,{m,side,b,g,nw,ok:(!!m||nw)&&b!=null&&b!==""&&g!=null})})}
 const vbTgt=x=>(x&&x.src)||$("#vbTarget").value;
+function vbFix(m,x){if(!m||!x.date||!x.hint)return null;const o={};if(m.time!==x.hint)o.time=x.hint;if(m.date!==x.date)o.date=x.date;if(x.league&&!m.league)o.league=x.league;
+  if(m.hg!=null&&m.hg!=="")return null;return Object.keys(o).length?o:null}
 function vbNewM(x){return {id:uid("m_"),createdAt:Date.now(),date:x.date,time:x.hint||"",league:x.league||"",home:x.home.trim(),away:x.away.trim(),hg:null,ag:null,line:"",lines:[],dl:{},note:""}}
 let VB=[];
 
@@ -3295,9 +3298,10 @@ function vbRender(){const el=$("#vbPrev");if(!VB.length){el.innerHTML='<p class=
   el.innerHTML=`<table class="mini hedge" style="width:100%"><thead><tr><th>Viber စာ</th><th>ပွဲ</th><th>ကြေး</th><th></th></tr></thead><tbody>${VB.map((x,i)=>{
     let m=x.m;const nm=!m&&x.nw?vbNewM(x):null;if(nm)x.side=x.forceSide||(x.giver?vbGiverSide(nm,x.giver):"home");const mm=m||nm;
     const line=mm&&x.ok?vbMake(mm,x):"";const cur=m&&vbCur(m,vbTgt(x));const T=vbTgt(x);
-    return `<tr><td class="small"><span class="chip ${T==="net"?"":"ex"}">${T==="net"?"Internet":"Yar"}</span> ${esc(x.raw)}</td><td>${m?`${esc(ddmm(m.date))} ${esc(m.time||"")} <b>${esc(m.home)}</b> – <b>${esc(m.away)}</b>`:nm?`<span class="chip win">➕ ပွဲသစ်</span> ${esc(ddmm(nm.date))} ${esc(nm.time)} ${nm.league?`<span class="small muted">${esc(nm.league)}</span> `:""}<b>${esc(nm.home)}</b> – <b>${esc(nm.away)}</b>`:'<span class="chip loss">ပွဲ မတွေ့</span>'}<br><select data-vbm="${i}" style="width:auto;max-width:100%;padding:3px 6px;margin-top:3px"><option value="">— ပွဲ ရွေးရန် —</option>${opts}</select></td>
+    const fx=vbFix(m,x);
+    return `<tr><td class="small"><span class="chip ${T==="net"?"":"ex"}">${T==="net"?"Internet":"Yar"}</span> ${esc(x.raw)}</td><td>${m?`${esc(ddmm(m.date))} ${esc(m.time||"")} <b>${esc(m.home)}</b> – <b>${esc(m.away)}</b>${fx?`<br><span class="chip warn">🕒 ပြင်မည်: ${fx.date?esc(ddmm(fx.date))+" ":""}${fx.time?esc(m.time||"?")+" → "+esc(fx.time):""}${fx.league?" · "+esc(fx.league):""}</span>`:""}`:nm?`<span class="chip win">➕ ပွဲသစ်</span> ${esc(ddmm(nm.date))} ${esc(nm.time)} ${nm.league?`<span class="small muted">${esc(nm.league)}</span> `:""}<b>${esc(nm.home)}</b> – <b>${esc(nm.away)}</b>`:'<span class="chip loss">ပွဲ မတွေ့</span>'}<br><select data-vbm="${i}" style="width:auto;max-width:100%;padding:3px 6px;margin-top:3px"><option value="">— ပွဲ ရွေးရန် —</option>${opts}</select></td>
       <td>${line?`<span class="line-tag">${esc(padL(line))}</span>${cur?`<br><span class="small muted">ယခု: ${esc(padL(cur))}${padL(cur)===padL(line)?" (တူ)":""}</span>`:""}`:(x.b==null||x.b===""||x.g==null?'<span class="chip loss">ကြေး ပုံစံ မှား</span>':"")}</td>
-      <td><input type="checkbox" data-vbon="${i}" ${x.ok&&padL(cur)!==padL(line)?"checked":""} ${x.ok?"":"disabled"}></td></tr>`}).join("")}</tbody></table>
+      <td><input type="checkbox" data-vbon="${i}" ${x.ok&&(padL(cur)!==padL(line)||fx)?"checked":""} ${x.ok?"":"disabled"}></td></tr>`}).join("")}</tbody></table>
     <div class="row" style="margin-top:8px"><button type="button" class="primary" id="vbApply">✓ ရွေးထားတာ ထည့်မည်</button><span class="small muted">${VB.filter(x=>x.ok).length}/${VB.length} ကြောင်း · Yar ${VB.filter(x=>vbTgt(x)==="yws").length} · Internet ${VB.filter(x=>vbTgt(x)==="net").length}${VB.some(x=>x.nw&&!x.m)?` · ➕ ပွဲသစ် ${VB.filter(x=>x.nw&&!x.m).length}`:""}</span></div>`;
   VB.forEach((x,i)=>{const s=el.querySelector(`[data-vbm="${i}"]`);if(s&&x.m)s.value=x.m.id})}
 function vbAutoTarget(){const ta=$("#vbText");const ls=ta.value.split(/\r?\n/);let y=0,n=0;
@@ -3319,17 +3323,19 @@ $("#rsCopy").addEventListener("click",async()=>{const now=Date.now();
   toast(ok?`${L.length} ပွဲ Copy ကူးပြီး — ChatGPT မှာ Paste ချပါ`:"Copy မရပါ — အကွက်ထဲက စာကို ကိုယ်တိုင် ကူးပါ")});
 $("#vbClear").addEventListener("click",()=>{$("#vbText").value="";VB=[];$("#vbPrev").innerHTML=""});
 $("#vbPrev").addEventListener("change",e=>{const s=e.target.closest("[data-vbm]");if(!s)return;const x=VB[+s.dataset.vbm];if(isBet()){const raw=x.raw;const m=S.matches.find(z=>z.id===s.value);if(m){const t=raw.split("|");t[1]=` ${m.time||""} ${m.home} vs ${m.away} `;VB[+s.dataset.vbm]=btParse(t.join("|"))[0]||x;}btRender();return}if(isRes()){x.m=S.matches.find(m=>m.id===s.value)||null;x.ok=!!x.m;rsRender();return}x.m=S.matches.find(m=>m.id===s.value)||null;x.side=x.m?(x.forceSide||(x.giver?vbGiverSide(x.m,x.giver):"home")):null;x.ok=!!x.m&&x.b!=null&&x.b!==""&&x.g!=null;vbRender()});
-$("#vbPrev").addEventListener("click",async e=>{if(!e.target.closest("#vbApply"))return;if(isBet())return btApply();if(isRes())return rsApply();const Y=ywsId();let n=0,nNew=0;
+$("#vbPrev").addEventListener("click",async e=>{if(!e.target.closest("#vbApply"))return;if(isBet())return btApply();if(isRes())return rsApply();const Y=ywsId();let n=0,nNew=0,nFix=0;
   for(const [i,x] of VB.entries()){const cb=$("#vbPrev").querySelector(`[data-vbon="${i}"]`);if(!cb||!cb.checked||!x.ok)continue;
     let m=x.m?S.matches.find(z=>z.id===x.m.id):null;
     if(!m&&x.nw){m=S.matches.find(z=>z.date===x.date&&normTeam(z.home)===normTeam(x.home)&&normTeam(z.away)===normTeam(x.away));
       if(!m){m=vbNewM(x);await put("matches",m);nNew++}x.m=m;x.side=x.forceSide||(x.giver?vbGiverSide(m,x.giver):"home")}
-    if(!m)continue;m=S.matches.find(z=>z.id===m.id)||m;const line=vbMake(m,x);
+    if(!m)continue;m=S.matches.find(z=>z.id===m.id)||m;
+    const fx=vbFix(m,x);if(fx){m=Object.assign({},m,fx);await put("matches",m);nFix++}
+    const line=vbMake(m,x);
     if(vbTgt(x)==="net"){if(padL(m.line||"")===padL(line))continue;await put("matches",Object.assign({},m,{line,lines:[...mLines(m),{at:Date.now(),text:line}]}));n++;continue}
     const cur=m.dl&&m.dl[Y]||{line:"",lines:[]};if(padL(cur.line||"")===padL(line))continue;
     const dl=Object.assign({},m.dl||{});dl[Y]={line,lines:[...(cur.lines||[]),{at:Date.now(),text:line}]};await put("matches",Object.assign({},m,{dl}));n++}
   if(nNew){const A=allowList();if(A){const add=VB.filter(x=>x.nw&&x.league&&!A.has(x.league)).map(x=>x.league);if(add.length){add.forEach(l=>A.add(l));await saveSettings({allow:[...A]})}}}
-  toast(`${nNew?`ပွဲသစ် ${nNew} ပွဲ · `:""}ကြေး ${n} ပွဲ ထည့်ပြီး`);VB=vbParse($("#vbText").value);vbRender()});
+  toast(`${nNew?`ပွဲသစ် ${nNew} ပွဲ · `:""}${nFix?`အချိန်ပြင် ${nFix} ပွဲ · `:""}ကြေး ${n} ပွဲ ထည့်ပြီး`);VB=vbParse($("#vbText").value);vbRender()});
 async function netSaveRow(tr){
   const m=S.matches.find(x=>x.id===tr.dataset.id);if(!m)return;
   const gi=tr.querySelector('[data-nl="g"]'),bi=tr.querySelector('[data-nl="b"]'),oi=tr.querySelector('[data-nl="o"]');
