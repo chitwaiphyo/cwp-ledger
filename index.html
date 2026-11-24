@@ -3151,10 +3151,20 @@ function vbPre(line){let L=String(line||"");
   return L.replace(/\s+/g," ").trim()}
 function vbSplitB(tok){let t=String(tok||"").replace(/\s+/g,"");let side=null;const m1=t.match(/^([HhAa])(.+)$/),m2=t.match(/^(.+?)([HhAa])$/);
   if(m1){side=/h/i.test(m1[1])?"home":"away";t=m1[2]}else if(m2){side=/h/i.test(m2[2])?"home":"away";t=m2[1]}return {b:t,side}}
+const VB_SRC=/^\s*(NET|Internet|108sode|iBet|YWS|Yar(?:\s*Win\s*Soe)?)\s*[:|\-]?\s*(?=\d|\[|[A-Za-z\u1000-\u109f]|$)/i;
+function vbDate(d,mo,y){d=+d;mo=+mo;if(!(d>=1&&d<=31&&mo>=1&&mo<=12))return null;const now=new Date();let Y=y?(+y<100?2000+ +y:+y):now.getFullYear();
+  if(!y){const diff=mo-(now.getMonth()+1);if(diff<-6)Y++;else if(diff>6)Y--}return `${Y}-${String(mo).padStart(2,"0")}-${String(d).padStart(2,"0")}`}
 function vbParse(text){const out=[];let hint=null,pair=null;
-  const lines=String(text||"").split(/\r?\n|;/).map(vbPre).filter(Boolean);
-  const push=(o)=>{const sb=vbSplitB(o.body);out.push(Object.assign(o,{body:sb.b,forceSide:sb.side}))};
-  for(let L of lines){
+  const lines=[];let cS=null,cD=null,cL=null;
+  String(text||"").split(/\r?\n|;/).forEach(r=>{let t=String(r||"");
+    const sm=t.match(VB_SRC);if(sm){cS=/^(yws|yar)/i.test(sm[1])?"yws":"net";t=t.slice(sm[0].length)}
+    const lm=t.match(/\[([^\]]{2,40})\]/);if(lm){cL=lm[1].trim();t=t.replace(lm[0]," ")}
+    const dm=t.match(/^\s*(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?(?=\s|$)/);if(dm){const d=vbDate(dm[1],dm[2],dm[3]);if(d){cD=d;t=t.slice(dm[0].length)}}
+    if(/close\s*time/i.test(t)&&!cS)cS="yws";
+    const L=vbPre(t);if(L)lines.push({L,src:cS,date:cD,league:cL})});
+  let CUR={};
+  const push=(o)=>{const sb=vbSplitB(o.body);out.push(Object.assign({src:CUR.src,date:CUR.date,league:CUR.league},o,{body:sb.b,forceSide:sb.side}))};
+  for(const it of lines){CUR=it;let L=it.L;
     if(/^close\s*time/i.test(L)||/ကြိုပိတ်|ပိတ်မည်|ပိတ်ပါမည်/.test(L))continue;
     const tm=L.match(/^(\d{1,2})[:.](\d{2})\b\s*(.*)$/);if(tm){hint=tm[1].padStart(2,"0")+":"+tm[2];L=tm[3].trim();if(!L)continue}
     L=L.replace(/^(?:change|ချိန်း|ပြောင်း)\s*[:：]?\s*/i,"");
@@ -3163,14 +3173,14 @@ function vbParse(text){const out=[];let hint=null,pair=null;
       let lm=right.match(new RegExp("^(.*?)\\s*"+VB_LN.source+"\\s*$"));if(lm)lm={pre:lm[1],body:lm[2],goal:lm[3]};
       if(!lm){const sp=right.match(VB_SP);if(sp)lm={pre:sp[1],body:sp[2],goal:sp[3]}}
       if(!lm){const on=right.match(VB_ONE);if(on&&/\d/.test(on[2]))lm={pre:on[1],body:on[2],goal:""}}
-      if(!lm){pair={home:left,away:right,hint};continue}
+      if(!lm){pair={home:left,away:right,hint,src:it.src,date:it.date,league:it.league};continue}
       const pre=lm.pre.trim().split(" ").filter(Boolean);let best=null;
       for(let k=1;k<pre.length;k++){const away=pre.slice(0,k).join(" "),g=pre.slice(k).join(" ");const sc=Math.max(vbTeamScore(g,left),vbTeamScore(g,away));if(!best||sc>best.sc)best={away,g,sc}}
       if(!best||best.sc<4)best={away:pre.join(" "),g:"",sc:0};
       push({raw:L,home:left,away:best.away,giver:best.g||"",body:lm.body,goal:lm.goal,hint});pair=null;continue}
     const re=new RegExp("(.*?)\\s*"+VB_LN.source,"g");let mm,any=false;
     while((mm=re.exec(L))){any=true;const g=mm[1].replace(/^[,;·|\s]+/,"").trim();
-      if(pair){push({raw:L,home:pair.home,away:pair.away,giver:g,body:mm[2],goal:mm[3],hint:pair.hint||hint});pair=null}
+      if(pair){push({raw:L,home:pair.home,away:pair.away,giver:g,body:mm[2],goal:mm[3],hint:pair.hint||hint,src:pair.src||it.src,date:pair.date||it.date,league:pair.league||it.league});pair=null}
       else if(g)push({raw:L,giver:g,body:mm[2],goal:mm[3],hint})}
     if(any)continue;
     const sp=L.match(VB_SP);
@@ -3178,10 +3188,14 @@ function vbParse(text){const out=[];let hint=null,pair=null;
     const one=L.match(VB_ONE);   // body only (no goal)
     if(one&&pair){push({raw:L,home:pair.home,away:pair.away,giver:one[1],body:one[2],goal:"",hint:pair.hint||hint});pair=null;continue}
   }
-  return out.map(x=>{const m=x.home?vbFind(x.home,x.away,x.hint):vbFind(x.giver,null,x.hint);
+  return out.map(x=>{let m=x.home?vbFind(x.home,x.away,x.hint):vbFind(x.giver,null,x.hint);
+    if(m&&x.date&&m.date!==x.date&&mBiz(m)!==bizDate(x.date,x.hint||"12:00")){const C2=S.matches.filter(z=>z.date===x.date);const m2=x.home?vbFind(x.home,x.away,x.hint,C2):null;m=m2||null}
     const b=normLine(vbLine(x.body)),g=x.goal?normLine(vbLine(x.goal)):"";
     let side=null;if(m){side=x.forceSide||(x.giver?vbGiverSide(m,x.giver):"home")}
-    return Object.assign(x,{m,side,b,g,ok:!!m&&b!=null&&b!==""&&g!=null})})}
+    const nw=!m&&!!x.home&&!!x.away&&!!x.date;
+    return Object.assign(x,{m,side,b,g,nw,ok:(!!m||nw)&&b!=null&&b!==""&&g!=null})})}
+const vbTgt=x=>(x&&x.src)||$("#vbTarget").value;
+function vbNewM(x){return {id:uid("m_"),createdAt:Date.now(),date:x.date,time:x.hint||"",league:x.league||"",home:x.home.trim(),away:x.away.trim(),hg:null,ag:null,line:"",lines:[],dl:{},note:""}}
 let VB=[];
 
 /* ---- ထိုးစာရင်း paste: ACC | [HH:MM] Home vs Away | PICK | LINE | UNITS [| live H-A] ---- */
@@ -3273,24 +3287,25 @@ async function rsApply(){let n=0,nb=0,tot=0;
     await put("matches",Object.assign({},m,{hg:x.H,ag:x.A}));n++;
     for(const b of S.bets.filter(b=>b.matchId===m.id&&!b.clearedId)){const o=Object.assign({},b,{hg:x.H,ag:x.A,settledAt:Date.now()});await put("bets",o);nb++;tot+=settle(o).net}}
   toast(`ရလဒ် ${n} ပွဲ ထည့်ပြီး${nb?` · ထိုး ${nb} ခု တွက်ပြီး: ${fmtS(tot)}`:""}`);VB=rsParse($("#vbText").value);rsRender()}
-function vbCur(m){return $("#vbTarget").value==="net"?(m.line||""):dLine(m,ywsId())}
-function vbMake(m,x){let g=x.g;const cur=vbCur(m);const pl=parseLine(cur,m.home,m.away);if(!g&&pl.goal)g=fmtML(pl.goal.ball,pl.goal.price);
-  const o={giver:x.side,body:x.b,goal:g};if($("#vbTarget").value==="net"&&pl.btts){o.by=pl.btts.yes||"";o.bn=pl.btts.no||""}return composeLine(m.home,m.away,o)}
+function vbCur(m,src){return (src||$("#vbTarget").value)==="net"?(m.line||""):dLine(m,ywsId())}
+function vbMake(m,x){let g=x.g;const cur=vbCur(m,vbTgt(x));const pl=parseLine(cur,m.home,m.away);if(!g&&pl.goal)g=fmtML(pl.goal.ball,pl.goal.price);
+  const o={giver:x.side,body:x.b,goal:g};if(vbTgt(x)==="net"&&pl.btts){o.by=pl.btts.yes||"";o.bn=pl.btts.no||""}return composeLine(m.home,m.away,o)}
 function vbRender(){const el=$("#vbPrev");if(!VB.length){el.innerHTML='<p class="small muted">ကြေး မတွေ့ပါ — ဥပမာ "Racing vs Sociedad" နောက်တစ်ကြောင်း "Sociedad -80/3-90"</p>';return}
   const Y=ywsId();const opts=vbCands().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).map(m=>`<option value="${esc(m.id)}">${esc(ddmm(m.date))} ${esc(m.time||"")} ${esc(m.home)} – ${esc(m.away)}</option>`).join("");
-  el.innerHTML=`<table class="mini hedge" style="width:100%"><thead><tr><th>Viber စာ</th><th>ပွဲ</th><th>${$("#vbTarget").value==="net"?"Internet ကြေး":"Yar ကြေး"}</th><th></th></tr></thead><tbody>${VB.map((x,i)=>{
-    const m=x.m;const line=m&&x.ok?vbMake(m,x):"";const cur=m&&vbCur(m);
-    return `<tr><td class="small">${esc(x.raw)}</td><td>${m?`${esc(ddmm(m.date))} ${esc(m.time||"")} <b>${esc(m.home)}</b> – <b>${esc(m.away)}</b>`:'<span class="chip loss">ပွဲ မတွေ့</span>'}<br><select data-vbm="${i}" style="width:auto;max-width:100%;padding:3px 6px;margin-top:3px"><option value="">— ပွဲ ရွေးရန် —</option>${opts}</select></td>
+  el.innerHTML=`<table class="mini hedge" style="width:100%"><thead><tr><th>Viber စာ</th><th>ပွဲ</th><th>ကြေး</th><th></th></tr></thead><tbody>${VB.map((x,i)=>{
+    let m=x.m;const nm=!m&&x.nw?vbNewM(x):null;if(nm)x.side=x.forceSide||(x.giver?vbGiverSide(nm,x.giver):"home");const mm=m||nm;
+    const line=mm&&x.ok?vbMake(mm,x):"";const cur=m&&vbCur(m,vbTgt(x));const T=vbTgt(x);
+    return `<tr><td class="small"><span class="chip ${T==="net"?"":"ex"}">${T==="net"?"Internet":"Yar"}</span> ${esc(x.raw)}</td><td>${m?`${esc(ddmm(m.date))} ${esc(m.time||"")} <b>${esc(m.home)}</b> – <b>${esc(m.away)}</b>`:nm?`<span class="chip win">➕ ပွဲသစ်</span> ${esc(ddmm(nm.date))} ${esc(nm.time)} ${nm.league?`<span class="small muted">${esc(nm.league)}</span> `:""}<b>${esc(nm.home)}</b> – <b>${esc(nm.away)}</b>`:'<span class="chip loss">ပွဲ မတွေ့</span>'}<br><select data-vbm="${i}" style="width:auto;max-width:100%;padding:3px 6px;margin-top:3px"><option value="">— ပွဲ ရွေးရန် —</option>${opts}</select></td>
       <td>${line?`<span class="line-tag">${esc(padL(line))}</span>${cur?`<br><span class="small muted">ယခု: ${esc(padL(cur))}${padL(cur)===padL(line)?" (တူ)":""}</span>`:""}`:(x.b==null||x.b===""||x.g==null?'<span class="chip loss">ကြေး ပုံစံ မှား</span>':"")}</td>
       <td><input type="checkbox" data-vbon="${i}" ${x.ok&&padL(cur)!==padL(line)?"checked":""} ${x.ok?"":"disabled"}></td></tr>`}).join("")}</tbody></table>
-    <div class="row" style="margin-top:8px"><button type="button" class="primary" id="vbApply">✓ ရွေးထားတာ <b>${$("#vbTarget").value==="net"?"Internet":"Yar Win Soe"}</b> ကြေး ထည့်မည်</button><span class="small muted">${VB.filter(x=>x.ok).length}/${VB.length} ပွဲ ကိုက်</span></div>`;
+    <div class="row" style="margin-top:8px"><button type="button" class="primary" id="vbApply">✓ ရွေးထားတာ ထည့်မည်</button><span class="small muted">${VB.filter(x=>x.ok).length}/${VB.length} ကြောင်း · Yar ${VB.filter(x=>vbTgt(x)==="yws").length} · Internet ${VB.filter(x=>vbTgt(x)==="net").length}${VB.some(x=>x.nw&&!x.m)?` · ➕ ပွဲသစ် ${VB.filter(x=>x.nw&&!x.m).length}`:""}</span></div>`;
   VB.forEach((x,i)=>{const s=el.querySelector(`[data-vbm="${i}"]`);if(s&&x.m)s.value=x.m.id})}
 function vbAutoTarget(){const ta=$("#vbText");const ls=ta.value.split(/\r?\n/);let y=0,n=0;
   const out=ls.map(l=>{const r=l.match(/^\s*(NET|Internet|108sode|iBet|YWS|Yar(?:\s*Win\s*Soe)?)\s*[:|\-]?\s+(?=\d{1,2}[:.]\d{2}|\D)/i);if(!r)return l;
     if(/^(yws|yar)/i.test(r[1]))y++;else n++;return l.slice(r[0].length)});
   if(!y&&!n&&/close\s*time/i.test(ta.value)){const sel=$("#vbTarget");if(sel.value==="net"){sel.value="yws";try{localStorage.setItem("kyay-vbtgt","yws")}catch(e){}}return}
   if(!y&&!n)return;const sel=$("#vbTarget");if(sel.value!=="bet"&&sel.value!=="res"){sel.value=n>y?"net":"yws";try{localStorage.setItem("kyay-vbtgt",sel.value)}catch(e){}}
-  if(!/^(bet)$/.test(sel.value))ta.value=out.join("\n")}
+}
 try{const t=localStorage.getItem("kyay-vbtgt");if(t&&$("#vbTarget").querySelector(`option[value="${t}"]`))$("#vbTarget").value=t}catch(e){}
 $("#vbCheck").addEventListener("click",()=>{vbAutoTarget();if(isBet()){VB=btParse($("#vbText").value);btRender();return}if(isRes()){VB=rsParse($("#vbText").value);rsRender();return}VB=vbParse($("#vbText").value);vbRender()});
 $("#vbOld").addEventListener("change",()=>$("#vbTarget").dispatchEvent(new Event("change")));
@@ -3304,13 +3319,17 @@ $("#rsCopy").addEventListener("click",async()=>{const now=Date.now();
   toast(ok?`${L.length} ပွဲ Copy ကူးပြီး — ChatGPT မှာ Paste ချပါ`:"Copy မရပါ — အကွက်ထဲက စာကို ကိုယ်တိုင် ကူးပါ")});
 $("#vbClear").addEventListener("click",()=>{$("#vbText").value="";VB=[];$("#vbPrev").innerHTML=""});
 $("#vbPrev").addEventListener("change",e=>{const s=e.target.closest("[data-vbm]");if(!s)return;const x=VB[+s.dataset.vbm];if(isBet()){const raw=x.raw;const m=S.matches.find(z=>z.id===s.value);if(m){const t=raw.split("|");t[1]=` ${m.time||""} ${m.home} vs ${m.away} `;VB[+s.dataset.vbm]=btParse(t.join("|"))[0]||x;}btRender();return}if(isRes()){x.m=S.matches.find(m=>m.id===s.value)||null;x.ok=!!x.m;rsRender();return}x.m=S.matches.find(m=>m.id===s.value)||null;x.side=x.m?(x.forceSide||(x.giver?vbGiverSide(x.m,x.giver):"home")):null;x.ok=!!x.m&&x.b!=null&&x.b!==""&&x.g!=null;vbRender()});
-$("#vbPrev").addEventListener("click",async e=>{if(!e.target.closest("#vbApply"))return;if(isBet())return btApply();if(isRes())return rsApply();const Y=ywsId();let n=0;
+$("#vbPrev").addEventListener("click",async e=>{if(!e.target.closest("#vbApply"))return;if(isBet())return btApply();if(isRes())return rsApply();const Y=ywsId();let n=0,nNew=0;
   for(const [i,x] of VB.entries()){const cb=$("#vbPrev").querySelector(`[data-vbon="${i}"]`);if(!cb||!cb.checked||!x.ok)continue;
-    const m=S.matches.find(z=>z.id===x.m.id);const line=vbMake(m,x);
-    if($("#vbTarget").value==="net"){if(padL(m.line||"")===padL(line))continue;await put("matches",Object.assign({},m,{line,lines:[...mLines(m),{at:Date.now(),text:line}]}));n++;continue}
+    let m=x.m?S.matches.find(z=>z.id===x.m.id):null;
+    if(!m&&x.nw){m=S.matches.find(z=>z.date===x.date&&normTeam(z.home)===normTeam(x.home)&&normTeam(z.away)===normTeam(x.away));
+      if(!m){m=vbNewM(x);await put("matches",m);nNew++}x.m=m;x.side=x.forceSide||(x.giver?vbGiverSide(m,x.giver):"home")}
+    if(!m)continue;m=S.matches.find(z=>z.id===m.id)||m;const line=vbMake(m,x);
+    if(vbTgt(x)==="net"){if(padL(m.line||"")===padL(line))continue;await put("matches",Object.assign({},m,{line,lines:[...mLines(m),{at:Date.now(),text:line}]}));n++;continue}
     const cur=m.dl&&m.dl[Y]||{line:"",lines:[]};if(padL(cur.line||"")===padL(line))continue;
     const dl=Object.assign({},m.dl||{});dl[Y]={line,lines:[...(cur.lines||[]),{at:Date.now(),text:line}]};await put("matches",Object.assign({},m,{dl}));n++}
-  toast(`${$("#vbTarget").value==="net"?"Internet":"Yar Win Soe"} ကြေး ${n} ပွဲ ထည့်ပြီး`);VB=vbParse($("#vbText").value);vbRender()});
+  if(nNew){const A=allowList();if(A){const add=VB.filter(x=>x.nw&&x.league&&!A.has(x.league)).map(x=>x.league);if(add.length){add.forEach(l=>A.add(l));await saveSettings({allow:[...A]})}}}
+  toast(`${nNew?`ပွဲသစ် ${nNew} ပွဲ · `:""}ကြေး ${n} ပွဲ ထည့်ပြီး`);VB=vbParse($("#vbText").value);vbRender()});
 async function netSaveRow(tr){
   const m=S.matches.find(x=>x.id===tr.dataset.id);if(!m)return;
   const gi=tr.querySelector('[data-nl="g"]'),bi=tr.querySelector('[data-nl="b"]'),oi=tr.querySelector('[data-nl="o"]');
