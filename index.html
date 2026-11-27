@@ -503,7 +503,7 @@ section.view svg{max-width:100%;height:auto}
       </div>
       <div class="row"><button class="primary" type="submit" id="mSave">မှတ်မည်</button><button class="ghost" type="button" id="mCancel" hidden>ပယ်ဖျက်</button><span class="small" id="mErr" style="color:var(--loss)"></span></div>
     </form></details>
-    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v27/11 15:20</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
+    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v27/11 15:40</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
     <div class="box-body" style="display:grid;gap:10px">
       <textarea id="vbText" rows="6" placeholder="Yar Win Soe ဆီက Viber စာကို ဒီမှာ Paste ချပါ&#10;ဥပမာ:&#10;9:45&#10;Racing vs Sociedad&#10;Sociedad -80/3-90&#10;Bilbao vs Espanyol Bilbao 1-30/3+20&#10;Change A Villa 1+50/3+40 Spur 1-10/3-20&#10;Hull vs Brighton 1(-32)A 3(50)u"></textarea>
       <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option><option value="bet">🎯 ထိုးစာရင်း</option></select><select id="vbDealer" style="width:auto" hidden title="ဒိုင်နာမည် မပါတဲ့ ထိုးစာ (ဥပမာ Racing 30000) အတွက် ဒိုင်"></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><label class="chk small" title="ကြေး/ရလဒ် မထည့်မိခဲ့တဲ့ ရက်ဟောင်းပွဲတွေပါ ရှာမယ်"><input type="checkbox" id="vbOld"> ရက် ၃၀ အတွင်း ပွဲဟောင်းပါ</label><button type="button" class="ghost" id="rsCopy" title="ရလဒ် မထည့်ရသေးတဲ့ ကန်ပြီးပွဲတွေကို ChatGPT အတွက် Copy ကူး">📤 ရလဒ်လိုတဲ့ပွဲ Copy</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
@@ -999,7 +999,7 @@ const MKT={body:"ဘော်ဒီ",goal:"ဂိုးပေါင်း",x12:"
 /* ---------- store: db capability + offline cache & write queue ---------- */
 const S={bets:[],dealers:[],payments:[],settings:[],matches:[],history:[],mode:"loading"};
 const COLS=["bets","dealers","payments","settings","matches","history"];
-const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="27/11 15:20";
+const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="27/11 15:40";
 const FB_CFG={apiKey:"AIzaSyCowWBBUMnp03gAxASeN-fWi_65XXHvL2o",authDomain:"cwp-ledger.firebaseapp.com",projectId:"cwp-ledger",storageBucket:"cwp-ledger.firebasestorage.app",messagingSenderId:"595192435834",appId:"1:595192435834:web:95d9892b256e44d26657c3"};const FB_UID="PtPXmvY7sZPUCX70XPLWHWqEqkb2";let FS=null;
 const SIMPLE=false;document.documentElement.classList.toggle("simple",SIMPLE);
 let db=null;const LS="kyay-ledger-v1",LC="kyay-cache-v1",LQ="kyay-queue-v1";
@@ -1677,7 +1677,8 @@ function parseLine(text,home,away){
     if(/btts|gg\b|နှစ်သင်းလုံး/i.test(sg)){const y=sg.match(/yes\s*(\d+(?:\.\d+)?)/i),n=sg.match(/no\s*(\d+(?:\.\d+)?)/i);out.btts={yes:y?+y[1]:null,no:n?+n[1]:null};continue}
     const m=sg.match(tok);if(!m)continue;const l=pml(m[1]);if(!l)continue;
     const low=norm(sg);const name=norm(sg.slice(0,m.index));
-    const isGoal=/ဂိုး|goal|o\/u|over|under|^g$|^ou$|ပေါ်|အောက်/.test(name||low);
+    const tHit=!!name&&[H,A].some(t=>t&&(t===name||(name.length>=4&&t.includes(name))||(t.length>=4&&name.includes(t))));
+    const isGoal=!tHit&&/ဂိုး|ပေါ်|အောက်|(?:^|\s)(?:goal|o\/u|over|under|g|ou)(?:\s|$)/.test(name||low);
     if(isGoal){if(!out.goal)out.goal=l;continue}
     if(out.body)continue;
     const hit=t=>t&&name&&(t.includes(name)||name.includes(t)||t.split(" ")[0]===name.split(" ")[0]||teamKey(t)===teamKey(name));
