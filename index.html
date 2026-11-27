@@ -207,6 +207,11 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .betfill-key{display:inline-block;width:12px;height:12px;border-radius:3px;background:#ffe7a0;border:1px solid #e0a800;vertical-align:-1px}
 #mvLineTg .tg{padding:4px 10px;border-radius:999px}#mvLineTg .tg[aria-pressed="true"]{background:var(--accent,#17694a);color:#fff;border-color:transparent}#mvLineTg .tg[aria-pressed="false"]{opacity:.65;text-decoration:line-through}
 .bet-dl{display:flex;flex-direction:column;gap:2px;align-items:flex-start;font-size:12.5px;line-height:1.35}.bet-dlr b{color:var(--accent,#17694a);margin-right:2px}
+#hcOut .tbl-wrap{overflow-x:auto!important;max-width:100%!important}
+#hcOut table.mini{table-layout:auto!important;width:100%!important;min-width:0!important}
+#hcOut table.mini td{white-space:nowrap!important;overflow-wrap:normal!important;padding:5px 6px;vertical-align:middle}
+@media (max-width:700px){#hcBox .row input{max-width:none!important;flex:1 1 40%;min-width:0}#hcBox .row select{flex:1 1 100%}#hcOut table.mini td{font-size:12px;padding:4px 4px}#hcOut td.hc-lg,#hcOut td .muted{display:none!important}
+  #hcOut table.mini,#hcOut table.mini tbody{display:table!important}#hcOut table.mini tr{display:table-row!important}#hcOut table.mini td{display:table-cell!important}}
 .lh{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:13px;align-items:center}.lh-i{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center}.lh-d{color:var(--accent)}tr.lhrow td{background:transparent!important;padding-top:0!important;border-top:0!important}
 .qb-st.on{background:var(--accent-soft);border-color:var(--accent)}.qb-ex{display:grid;gap:2px;border-top:1px dashed var(--line);padding-top:6px}
 .qb-calc{display:flex;flex-wrap:wrap;gap:4px 14px}.qb-p.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
@@ -440,6 +445,7 @@ section.view svg{max-width:100%;height:auto}
       <a href="#matches">ပွဲစဉ်</a>
       <a href="#ledger">မှတ်တမ်း</a>
       <a href="#statement">ရှင်းတမ်း</a>
+      <a href="#history">History</a>
       <a href="#dealers">ဒိုင်များ</a>
     </nav>
   </div>
@@ -503,7 +509,7 @@ section.view svg{max-width:100%;height:auto}
       </div>
       <div class="row"><button class="primary" type="submit" id="mSave">မှတ်မည်</button><button class="ghost" type="button" id="mCancel" hidden>ပယ်ဖျက်</button><span class="small" id="mErr" style="color:var(--loss)"></span></div>
     </form></details>
-    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v27/11 16:00</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
+    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v27/11 20:30</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
     <div class="box-body" style="display:grid;gap:10px">
       <textarea id="vbText" rows="6" placeholder="Yar Win Soe ဆီက Viber စာကို ဒီမှာ Paste ချပါ&#10;ဥပမာ:&#10;9:45&#10;Racing vs Sociedad&#10;Sociedad -80/3-90&#10;Bilbao vs Espanyol Bilbao 1-30/3+20&#10;Change A Villa 1+50/3+40 Spur 1-10/3-20&#10;Hull vs Brighton 1(-32)A 3(50)u"></textarea>
       <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option><option value="bet">🎯 ထိုးစာရင်း</option></select><select id="vbDealer" style="width:auto" hidden title="ဒိုင်နာမည် မပါတဲ့ ထိုးစာ (ဥပမာ Racing 30000) အတွက် ဒိုင်"></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><label class="chk small" title="ကြေး/ရလဒ် မထည့်မိခဲ့တဲ့ ရက်ဟောင်းပွဲတွေပါ ရှာမယ်"><input type="checkbox" id="vbOld"> ရက် ၃၀ အတွင်း ပွဲဟောင်းပါ</label><button type="button" class="ghost" id="rsCopy" title="ရလဒ် မထည့်ရသေးတဲ့ ကန်ပြီးပွဲတွေကို ChatGPT အတွက် Copy ကူး">📤 ရလဒ်လိုတဲ့ပွဲ Copy</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
@@ -565,6 +571,18 @@ section.view svg{max-width:100%;height:auto}
 
   <!-- HISTORY -->
   <section class="view" id="v-history" hidden>
+    <div class="panel" id="hcBox" style="display:grid;gap:10px;margin-bottom:14px;min-width:0">
+      <h3 style="margin:0">⚔️ နှစ်သင်း ယှဉ်ကြည့် — ပေါက်သင့်ကြေး</h3>
+      <div class="row" style="gap:6px;align-items:center">
+        <input id="hcH" list="hTeams" placeholder="အိမ်ကွင်း အသင်း" autocomplete="off" style="max-width:220px">
+        <button type="button" class="ghost" id="hcSwap" title="အိမ်/အဝေး လဲ">⇄</button>
+        <input id="hcA" list="hTeams" placeholder="အဝေးကွင်း အသင်း" autocomplete="off" style="max-width:220px">
+        <select id="hcLg" style="width:auto" title="ပြိုင်ပွဲ (အိမ်ကွင်းအားသာချက် တွက်ဖို့)"></select>
+        <button type="button" class="primary" id="hcGo">ယှဉ်ကြည့်မည်</button>
+      </div>
+      <datalist id="hTeams"></datalist>
+      <div id="hcOut" style="min-width:0"></div>
+    </div>
     <div class="row between"><h2>ပွဲရလဒ် နှင့် ကြေး History</h2><span class="small muted" id="hCount"></span></div>
     <div class="row">
       <input id="hQ" type="search" placeholder="အသင်း ရှာရန် (ဥပမာ Arsenal)" style="max-width:240px">
@@ -999,7 +1017,7 @@ const MKT={body:"ဘော်ဒီ",goal:"ဂိုးပေါင်း",x12:"
 /* ---------- store: db capability + offline cache & write queue ---------- */
 const S={bets:[],dealers:[],payments:[],settings:[],matches:[],history:[],mode:"loading"};
 const COLS=["bets","dealers","payments","settings","matches","history"];
-const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="27/11 16:00";
+const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="27/11 20:30";
 const FB_CFG={apiKey:"AIzaSyCowWBBUMnp03gAxASeN-fWi_65XXHvL2o",authDomain:"cwp-ledger.firebaseapp.com",projectId:"cwp-ledger",storageBucket:"cwp-ledger.firebasestorage.app",messagingSenderId:"595192435834",appId:"1:595192435834:web:95d9892b256e44d26657c3"};const FB_UID="PtPXmvY7sZPUCX70XPLWHWqEqkb2";let FS=null;
 const SIMPLE=false;document.documentElement.classList.toggle("simple",SIMPLE);
 let db=null;const LS="kyay-ledger-v1",LC="kyay-cache-v1",LQ="kyay-queue-v1";
@@ -1881,8 +1899,46 @@ function sameLinePanel(m,recs){
 let histPage=1;
 ["#hQ","#hLeague","#hSeason","#hLine","#hGoal"].forEach(x=>$(x).addEventListener("input",()=>{histPage=1;renderHistory()}));
 $("#hMore").addEventListener("click",()=>{histPage++;renderHistory()});
+/* ---------- History: နှစ်သင်း ယှဉ်ကြည့် ---------- */
+let HC_T=null;
+function hcTeams(){const recs=allRecs();if(HC_T&&HC_T.n===recs.length)return HC_T;const cnt=new Map(),nm=new Map(),lg=new Map();
+  recs.forEach(r=>[r.home,r.away].forEach(t=>{const k=teamKey(t);cnt.set(k,(cnt.get(k)||0)+1);const c=nm.get(k)||{};c[t]=(c[t]||0)+1;nm.set(k,c);if(!lg.has(k))lg.set(k,r.league)}));
+  const name=k=>{const c=nm.get(k)||{};return Object.keys(c).sort((a,b)=>c[b]-c[a])[0]||k};
+  HC_T={n:recs.length,cnt,name,lg,list:[...cnt.keys()].filter(k=>cnt.get(k)>=2).map(name).sort((a,b)=>a.localeCompare(b))};return HC_T}
+function hcFill(){const T=hcTeams();const dl=$("#hTeams");if(dl.childElementCount!==T.list.length)dl.innerHTML=T.list.map(t=>`<option value="${esc(t)}">`).join("");
+  const sel=$("#hcLg");if(!sel.options.length){const L=[...new Set(allRecs().slice(0,6000).map(r=>r.league))].filter(Boolean).sort();sel.innerHTML='<option value="">ပြိုင်ပွဲ (အလိုလို)</option>'+L.map(x=>`<option>${esc(x)}</option>`).join("")}}
+function hcSum(k,recs,n){const L=recs.filter(r=>teamKey(r.home)===k||teamKey(r.away)===k).slice(0,n);let w=0,d=0,l=0,gf=0,ga=0,bw=0,bn=0,ov=0,on=0;
+  L.forEach(r=>{const h=teamKey(r.home)===k;const f=h?r.hg:r.ag,a=h?r.ag:r.hg;gf+=f;ga+=a;f>a?w++:f<a?l++:d++;
+    if(r.giver&&r.body){const p=pml(r.body);if(p){const side=h?"home":"away";const fc=factorOf({market:"body",giver:r.giver,pick:side,ball:p.ball,price:p.price},r.hg,r.ag);bn++;if(fc>0)bw+=fc>=1?1:.5;else if(fc===0)bw+=.5}}
+    if(r.goal){const p=pml(r.goal);if(p){const fc=factorOf({market:"goal",pick:"over",ball:p.ball,price:p.price},r.hg+r.ag,0);on++;if(fc>0)ov+=fc>=1?1:.5;else if(fc===0)ov+=.5}}});
+  return {L,n:L.length,w,d,l,gf,ga,bw,bn,ov,on}}
+function hcRows(L,k){return L.map(r=>{const h=teamKey(r.home)===k;const f=h?r.hg:r.ag,a=h?r.ag:r.hg;const res=f>a?'<b class="pos">W</b>':f<a?'<b class="neg">L</b>':'<b>D</b>';
+  const gv=r.giver?(r.giver==="home"?r.home:r.away):"";return `<tr><td class="nowrap small">${esc(ddmm(r.date))}</td><td>${res}</td><td class="small">${h?"vs":"@"} ${esc(h?r.away:r.home)} <span class="muted">${h?"(အိမ်)":"(အဝေး)"}</span></td><td class="num nowrap">${f}-${a}</td><td class="small nowrap">${r.body?`<span class="${gv&&teamKey(gv)===k?"giver":""}">${esc(gv)}</span> ${esc(r.body)}`:"—"}</td><td class="small nowrap">${r.goal?"G "+esc(r.goal):"—"}</td></tr>`}).join("")}
+function hcRender(){const hq=$("#hcH").value.trim(),aq=$("#hcA").value.trim();const out=$("#hcOut");if(!hq||!aq){out.innerHTML='<p class="small muted">အိမ်ကွင်း နဲ့ အဝေးကွင်း အသင်း ရိုက်ပြီး <b>ယှဉ်ကြည့်မည်</b> နှိပ်ပါ။</p>';return}
+  const recs=allRecs();const T=hcTeams();const A=teamKey(hq),B=teamKey(aq);const na=T.cnt.get(A)||0,nb=T.cnt.get(B)||0;
+  if(!na||!nb){out.innerHTML=`<p class="small neg">History မတွေ့ပါ — ${!na?esc(hq):""}${!na&&!nb?" · ":""}${!nb?esc(aq):""}။ စာရင်းထဲက နာမည်ကို ရွေးပါ။</p>`;return}
+  const dom=k=>{const c={};recs.filter(r=>teamKey(r.home)===k||teamKey(r.away)===k).slice(0,30).forEach(r=>{if(r.league&&!/uefa|cup|pokal|copa|coppa|coupe|friendl|super cup|shield|trophy/i.test(r.league))c[r.league]=(c[r.league]||0)+1});return Object.keys(c).sort((a,b)=>c[b]-c[a])[0]||""};
+  const lg=$("#hcLg").value||dom(A)||T.lg.get(A)||"";const today=new Date(Date.now()+6.5*3600e3).toISOString().slice(0,10);
+  const m={id:"_cmp",home:T.name(A),away:T.name(B),date:today,time:"",league:lg,line:"",lines:[],dl:{},note:""};
+  const sa=hcSum(A,recs,10),sb=hcSum(B,recs,10);const pc=(x,n)=>n?Math.round(x/n*100)+"%":"—";
+  const card=(nm,s,k)=>`<div class="panel" style="min-width:0;display:grid;gap:6px"><div class="row between"><b>${esc(nm)}</b><span class="small muted">History ${T.cnt.get(k)} ပွဲ</span></div>
+    <div class="small">နောက်ဆုံး ${s.n} ပွဲ: <b class="pos">${s.w}W</b> ${s.d}D <b class="neg">${s.l}L</b> · ဂိုး ${s.gf}-${s.ga} · ဘော်ဒီ ပေါက် ${pc(s.bw,s.bn)} · ဂိုးပေါ် ${pc(s.ov,s.on)}</div>
+    <div class="tbl-wrap"><table class="mini"><tbody>${hcRows(s.L,k)}</tbody></table></div></div>`;
+  const h2h=recs.filter(r=>{const h=teamKey(r.home),a=teamKey(r.away);return (h===A&&a===B)||(h===B&&a===A)}).slice(0,8);
+  out.innerHTML=`<div class="small muted">ပြိုင်ပွဲ: <b>${esc(lg||"—")}</b> (အိမ်ကွင်း အားသာချက် ${hadv(lg)} ပြား) · ${esc(ddmm(today))} မှာ ကန်မယ်ဆိုရင်</div>
+    <div id="hcFair">${fairPanel(m,recs)}</div>
+    <div class="panel" style="min-width:0"><h3 style="margin:0 0 6px">🔁 နှစ်သင်း တွေ့ခဲ့တာ (${h2h.length})</h3>${h2h.length?`<div class="tbl-wrap"><table class="mini"><tbody>${h2h.map(r=>{const gv=r.giver?(r.giver==="home"?r.home:r.away):"";return `<tr><td class="small nowrap">${esc(ddmm(r.date))} ${esc(String(r.date).slice(0,4))}</td><td class="small hc-lg">${esc(r.league)}</td><td>${esc(r.home)} <b class="num">${r.hg}-${r.ag}</b> ${esc(r.away)}</td><td class="small nowrap">${r.body?`<span class="giver">${esc(gv)}</span> ${esc(r.body)}`:"—"}</td><td class="small nowrap">${r.goal?"G "+esc(r.goal):"—"}</td></tr>`}).join("")}</tbody></table></div>`:'<span class="small muted">မတွေ့ခဲ့ဖူးပါ</span>'}</div>
+    <div class="hc-two" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px">${card(m.home+" 🏠",sa,A)}${card(m.away+" ✈️",sb,B)}</div>`}
+$("#hcGo").addEventListener("click",()=>{try{localStorage.setItem("kyay-hc",JSON.stringify([$("#hcH").value,$("#hcA").value]))}catch(e){}hcRender()});
+$("#hcSwap").addEventListener("click",()=>{const a=$("#hcH").value;$("#hcH").value=$("#hcA").value;$("#hcA").value=a;if($("#hcOut").innerHTML)hcRender()});
+["#hcH","#hcA"].forEach(x=>$(x).addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();hcRender()}}));
+$("#hcLg").addEventListener("change",()=>{if($("#hcH").value&&$("#hcA").value)hcRender()});
+$("#hcOut").addEventListener("change",e=>{if(e.target.id==="fgN"){FGN=+e.target.value||5;hcRender()}if(e.target.id==="flN"){FLN=+e.target.value||20;hcRender()}});
+try{const v=JSON.parse(localStorage.getItem("kyay-hc")||"null");if(v){$("#hcH").value=v[0]||"";$("#hcA").value=v[1]||""}}catch(e){}
+
 $("#hClear").addEventListener("click",()=>{["#hQ","#hLeague","#hSeason","#hLine","#hGoal"].forEach(x=>$(x).value="");histPage=1;renderHistory()});
 function renderHistory(){
+  try{hcFill()}catch(e){}
   const rows=allRecs();H();
   const ls=$("#hLeague"),sv=$("#hSeason");const lv=ls.value,ssv=sv.value;
   ls.innerHTML='<option value="">ပြိုင်ပွဲ အားလုံး</option>'+[...new Set(rows.map(r=>r.league))].sort().map(x=>`<option>${esc(x)}</option>`).join("");ls.value=lv;
