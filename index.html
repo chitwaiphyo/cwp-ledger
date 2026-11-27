@@ -206,6 +206,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 #matchList input.betfill{background:#ffe7a0!important;border-color:#e0a800!important;color:#5a4300}
 .betfill-key{display:inline-block;width:12px;height:12px;border-radius:3px;background:#ffe7a0;border:1px solid #e0a800;vertical-align:-1px}
 #mvLineTg .tg{padding:4px 10px;border-radius:999px}#mvLineTg .tg[aria-pressed="true"]{background:var(--accent,#17694a);color:#fff;border-color:transparent}#mvLineTg .tg[aria-pressed="false"]{opacity:.65;text-decoration:line-through}
+.bet-dl{display:flex;flex-direction:column;gap:2px;align-items:flex-start;font-size:12.5px;line-height:1.35}.bet-dlr b{color:var(--accent,#17694a);margin-right:2px}
 .lh{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:13px;align-items:center}.lh-i{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center}.lh-d{color:var(--accent)}tr.lhrow td{background:transparent!important;padding-top:0!important;border-top:0!important}
 .qb-st.on{background:var(--accent-soft);border-color:var(--accent)}.qb-ex{display:grid;gap:2px;border-top:1px dashed var(--line);padding-top:6px}
 .qb-calc{display:flex;flex-wrap:wrap;gap:4px 14px}.qb-p.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
@@ -502,7 +503,7 @@ section.view svg{max-width:100%;height:auto}
       </div>
       <div class="row"><button class="primary" type="submit" id="mSave">မှတ်မည်</button><button class="ghost" type="button" id="mCancel" hidden>ပယ်ဖျက်</button><span class="small" id="mErr" style="color:var(--loss)"></span></div>
     </form></details>
-    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v27/11 16:00</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
+    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v27/11 15:20</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
     <div class="box-body" style="display:grid;gap:10px">
       <textarea id="vbText" rows="6" placeholder="Yar Win Soe ဆီက Viber စာကို ဒီမှာ Paste ချပါ&#10;ဥပမာ:&#10;9:45&#10;Racing vs Sociedad&#10;Sociedad -80/3-90&#10;Bilbao vs Espanyol Bilbao 1-30/3+20&#10;Change A Villa 1+50/3+40 Spur 1-10/3-20&#10;Hull vs Brighton 1(-32)A 3(50)u"></textarea>
       <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option><option value="bet">🎯 ထိုးစာရင်း</option></select><select id="vbDealer" style="width:auto" hidden title="ဒိုင်နာမည် မပါတဲ့ ထိုးစာ (ဥပမာ Racing 30000) အတွက် ဒိုင်"></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><label class="chk small" title="ကြေး/ရလဒ် မထည့်မိခဲ့တဲ့ ရက်ဟောင်းပွဲတွေပါ ရှာမယ်"><input type="checkbox" id="vbOld"> ရက် ၃၀ အတွင်း ပွဲဟောင်းပါ</label><button type="button" class="ghost" id="rsCopy" title="ရလဒ် မထည့်ရသေးတဲ့ ကန်ပြီးပွဲတွေကို ChatGPT အတွက် Copy ကူး">📤 ရလဒ်လိုတဲ့ပွဲ Copy</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
@@ -998,7 +999,7 @@ const MKT={body:"ဘော်ဒီ",goal:"ဂိုးပေါင်း",x12:"
 /* ---------- store: db capability + offline cache & write queue ---------- */
 const S={bets:[],dealers:[],payments:[],settings:[],matches:[],history:[],mode:"loading"};
 const COLS=["bets","dealers","payments","settings","matches","history"];
-const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="27/11 16:00";
+const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="27/11 15:20";
 const FB_CFG={apiKey:"AIzaSyCowWBBUMnp03gAxASeN-fWi_65XXHvL2o",authDomain:"cwp-ledger.firebaseapp.com",projectId:"cwp-ledger",storageBucket:"cwp-ledger.firebasestorage.app",messagingSenderId:"595192435834",appId:"1:595192435834:web:95d9892b256e44d26657c3"};const FB_UID="PtPXmvY7sZPUCX70XPLWHWqEqkb2";let FS=null;
 const SIMPLE=false;document.documentElement.classList.toggle("simple",SIMPLE);
 let db=null;const LS="kyay-ledger-v1",LC="kyay-cache-v1",LQ="kyay-queue-v1";
@@ -2971,6 +2972,11 @@ function qbPresets(d){if(!d)return [];const u=isUnitD(d)&&d.unitValue;const isY=
   const learned=[...cnt.entries()].sort((a,b)=>b[1]-a[1]).slice(0,5).map(x=>x[0]);
   const base=[];
   return [...new Set(base.concat(learned))].sort((a,b)=>a-b).slice(0,8)}
+const dShort=d=>!d?"?":d.id===ywsId()?"Yar":String(d.name||"").replace(/^ibet\s*/i,"").replace(/^acc[-\s]*/i,"");
+function betDlHtml(bs){const G=new Map();bs.forEach(b=>{const k=b.dealerId;if(!G.has(k))G.set(k,{body:0,goal:0,oth:0});const g=G.get(k);const d=dealerOf(k);const u=d&&isUnitD(d)&&d.unitValue?b.stake/d.unitValue:b.stake;g[b.market==="body"?"body":b.market==="goal"?"goal":"oth"]+=u});
+  const yw=ywsId();return [...G.entries()].sort((a,b)=>(b[0]===yw)-(a[0]===yw)).map(([k,g])=>{const d=dealerOf(k);const un=d&&isUnitD(d)&&d.unitValue?" U":"";const f=v=>(+v.toFixed(2)).toLocaleString("en-US")+un;
+    const parts=[g.body?`<span title="ဘော်ဒီ">B ${f(g.body)}</span>`:"",g.goal?`<span title="ဂိုးပေါင်း">G ${f(g.goal)}</span>`:"",g.oth?f(g.oth):""].filter(Boolean).join(" · ");
+    return `<div class="bet-dlr"><b>${esc(dShort(d))}</b> ${parts}</div>`}).join("")}
 function qbExisting(m){const bs=S.bets.filter(b=>b.matchId===m.id);if(!bs.length)return "";
   const g=new Map();bs.forEach(b=>{const k=b.dealerId+"|"+b.market+"|"+b.pick+"|"+b.ball+"|"+b.price;if(!g.has(k))g.set(k,[]);g.get(k).push(b)});
   return `<div class="small qb-ex">${[...g.values()].map(arr=>{const b=arr[0];const d=dealerOf(b.dealerId);const u=d&&isUnitD(d)&&d.unitValue;const f=x=>u?`${+(x/d.unitValue).toFixed(2)} U <span class="muted">(${fmt(x)})</span>`:fmt(x);const tot=arr.reduce((a,x)=>a+x.stake,0);
@@ -3054,7 +3060,7 @@ function renderMatches(){
         const c=(yb||yg)?ahaCalc(m,YW,+AHA.T||20):null;const hit=c&&((c.body&&c.body.hit)||(c.goal&&c.goal.hit));
         return `<td class="c nowrap k-yws"><span class="k-lab">${esc(dealerName(YW))} </span><div class="ahaIn"><input type="hidden" data-ah="g" value="${gy}"><input data-ah="b" value="${esc(yb)}" placeholder="ဘော်ဒီ" aria-label="ဘော်ဒီကြေး"${fYB?' class="betfill" title="Yar ဆီ ဘော်ဒီ ထိုးထား"':""}${m.hg!=null?" disabled":""}><input data-ah="o" value="${esc(yg)}" placeholder="ဂိုး" aria-label="ဂိုးကြေး"${fYG?' class="betfill" title="Yar ဆီ ဂိုးပေါင်း ထိုးထား"':""}${m.hg!=null?" disabled":""}></div></td>`})():""}
       ${C.btts?`<td class="c nowrap small k-btts">${pl.btts?`${pl.btts.yes?"Y "+pl.btts.yes:""}${pl.btts.yes&&pl.btts.no?"<br>":""}${pl.btts.no?"N "+pl.btts.no:""}`:'<span class="muted">—</span>'}</td>`:""}
-      ${C.bets?`<td class="c nowrap k-bets">${bs.length?`<span class="chip win" title="ထိုးကြေး စုစုပေါင်း">${bs.length} · ${fmt(bs.reduce((a,b)=>a+b.stake,0))}</span>${m.hg!=null?`<br><span class="num small ${cls(net)}">${fmtS(net)}</span>`:""}`:'<span class="muted">—</span>'}</td>`:""}
+      ${C.bets?`<td class="c nowrap k-bets">${bs.length?`<div class="bet-dl">${betDlHtml(bs)}</div>${m.hg!=null?`<span class="num small ${cls(net)}">${fmtS(net)}</span>`:""}`:'<span class="muted">—</span>'}</td>`:""}
       <td class="nowrap k-act"><div class="acts"><button type="button" class="primary small" data-act="qb">ထိုးမည်</button>${m.hg==null?'<button type="button" class="small" data-act="lineUp">ကြေး</button>':""}<button type="button" class="ghost small" data-act="edit">ပြင်</button><button type="button" class="ghost small danger" data-act="del">ဖျက်</button></div></td></tr>`;
     const sub=(m.hg==null&&openHist.has("u:"+m.id))?`<tr class="mrow sub" data-id="${esc(m.id)}"><td colspan="${ncol}">${m.hg==null&&openHist.has("u:"+m.id)?`<div class="lineup">${lineFieldsHtml("q"+m.id,m)}<button type="button" class="primary" data-act="lineSave">ကြေးအသစ် မှတ်မည်</button></div>`:""}</td></tr>`:"";
     const lh=lhHtml(m);const lhr=lh?`<tr class="mrow sub lhrow" data-id="${esc(m.id)}"><td colspan="${ncol}">${lh}</td></tr>`:"";
