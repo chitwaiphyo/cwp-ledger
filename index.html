@@ -503,7 +503,7 @@ section.view svg{max-width:100%;height:auto}
       </div>
       <div class="row"><button class="primary" type="submit" id="mSave">မှတ်မည်</button><button class="ghost" type="button" id="mCancel" hidden>ပယ်ဖျက်</button><span class="small" id="mErr" style="color:var(--loss)"></span></div>
     </form></details>
-    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v27/11 15:40</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
+    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v27/11 16:00</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
     <div class="box-body" style="display:grid;gap:10px">
       <textarea id="vbText" rows="6" placeholder="Yar Win Soe ဆီက Viber စာကို ဒီမှာ Paste ချပါ&#10;ဥပမာ:&#10;9:45&#10;Racing vs Sociedad&#10;Sociedad -80/3-90&#10;Bilbao vs Espanyol Bilbao 1-30/3+20&#10;Change A Villa 1+50/3+40 Spur 1-10/3-20&#10;Hull vs Brighton 1(-32)A 3(50)u"></textarea>
       <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option><option value="bet">🎯 ထိုးစာရင်း</option></select><select id="vbDealer" style="width:auto" hidden title="ဒိုင်နာမည် မပါတဲ့ ထိုးစာ (ဥပမာ Racing 30000) အတွက် ဒိုင်"></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><label class="chk small" title="ကြေး/ရလဒ် မထည့်မိခဲ့တဲ့ ရက်ဟောင်းပွဲတွေပါ ရှာမယ်"><input type="checkbox" id="vbOld"> ရက် ၃၀ အတွင်း ပွဲဟောင်းပါ</label><button type="button" class="ghost" id="rsCopy" title="ရလဒ် မထည့်ရသေးတဲ့ ကန်ပြီးပွဲတွေကို ChatGPT အတွက် Copy ကူး">📤 ရလဒ်လိုတဲ့ပွဲ Copy</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
@@ -999,7 +999,7 @@ const MKT={body:"ဘော်ဒီ",goal:"ဂိုးပေါင်း",x12:"
 /* ---------- store: db capability + offline cache & write queue ---------- */
 const S={bets:[],dealers:[],payments:[],settings:[],matches:[],history:[],mode:"loading"};
 const COLS=["bets","dealers","payments","settings","matches","history"];
-const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="27/11 15:40";
+const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="27/11 16:00";
 const FB_CFG={apiKey:"AIzaSyCowWBBUMnp03gAxASeN-fWi_65XXHvL2o",authDomain:"cwp-ledger.firebaseapp.com",projectId:"cwp-ledger",storageBucket:"cwp-ledger.firebasestorage.app",messagingSenderId:"595192435834",appId:"1:595192435834:web:95d9892b256e44d26657c3"};const FB_UID="PtPXmvY7sZPUCX70XPLWHWqEqkb2";let FS=null;
 const SIMPLE=false;document.documentElement.classList.toggle("simple",SIMPLE);
 let db=null;const LS="kyay-ledger-v1",LC="kyay-cache-v1",LQ="kyay-queue-v1";
@@ -3232,8 +3232,12 @@ function btDealer(t){if(/^@/.test(String(t).trim()))return dealerOf(String(t).tr
 function btFind1(q,C){const now=Date.now();let best=null,bs=0,bk=0;C.forEach(m=>{const sc=Math.max(vbTeamScore(q,m.home),vbTeamScore(q,m.away));if(!sc)return;
     const k=kickTs(m)||now;const fin=m.hg!=null&&m.hg!=="";const pr=(fin?0:2)+(k>now-3*3600e3?1:0);const sc2=sc*10+pr;
     if(sc2>bs||(sc2===bs&&Math.abs(k-now)<Math.abs(bk-now))){best=m;bs=sc2;bk=k}});return best}
-const BT_G=/^(g\s*[+\-]|g\s*(?:over|under)|ဂိုး\s*(?:ပေါ်|အောက်)|ပေါ်|အောက်|over|under)$/i;
-const btOU=t=>/(\+|over|ပေါ်)/i.test(t)?"over":"under";
+/* goal words: G Over / g over / G+ / g+ / Over / O / ဂိုးပေါ် / ပေါ်  ·  G Under / G- / Under / U / ဂိုးအောက် / အောက် */
+const BT_GW="(?:g\\s*(?:over|under|\\+|-)|goal\\s*(?:over|under|\\+|-)|ဂိုး\\s*(?:ပေါ်|အောက်|\\+|-)|over|under|ပေါ်|အောက်)";
+const BT_G=new RegExp("^"+BT_GW+"$","i");
+const btGP=t=>{const x=String(t||"").toLowerCase().replace(/\s+/g,"");if(!x)return null;
+  if(/^(?:g|goal|ဂိုး)?(?:over|ov|o|\+|ပေါ်)$/.test(x))return "over";if(/^(?:g|goal|ဂိုး)?(?:under|un|u|-|အောက်)$/.test(x))return "under";return null};
+const btOU=t=>btGP(t)||(/(\+|over|ပေါ်)/i.test(t)?"over":"under");
 function btDefD(){const v=$("#vbDealer")&&$("#vbDealer").value;const d=v&&dealerOf(v);return d?"@"+d.id:"YWS"}
 function btDealerFill(){const el=$("#vbDealer");if(!el)return;const yw=ywsId();const cur=el.value||(()=>{try{return localStorage.getItem("kyay-vbdealer")}catch(e){return null}})()||yw;
   el.innerHTML=S.dealers.filter(d=>!d.example).sort((a,b)=>((b.id===yw)-(a.id===yw))||a.name.localeCompare(b.name)).map(d=>`<option value="${esc(d.id)}"${d.id===cur?" selected":""}>ဒိုင်: ${esc(d.name)}</option>`).join("");
@@ -3241,15 +3245,18 @@ function btDealerFill(){const el=$("#vbDealer");if(!el)return;const yw=ywsId();c
 function btParse(text){const out=[];const C=btCands();
   String(text||"").split(/\r?\n/).forEach(raw=>{let L=String(raw||"").replace(/[၀-၉]/g,c=>String(c.charCodeAt(0)-0x1040)).replace(/[−–—]/g,"-").replace(/ /g," ").trim();
     L=L.replace(/^\s*(?:\d{1,2}[.)]\s+|[-•*►➤▪●◆]+\s*)/u,"");if(!L)return;
-    if(!L.includes("|")){const r=L.match(/^(.+?)\s+(?:(g\s*[+\-]|g\s*(?:over|under)|ဂိုး\s*(?:ပေါ်|အောက်)|ပေါ်|အောက်|over|under)\s+)?([\d,]+(?:\.\d+)?)\s*(?:u|unit|units)?$/i);if(!r)return;
-      L=`${btDefD()} | ${r[1].trim()} | ${r[2]?(btOU(r[2])==="over"?"Over":"Under"):r[1].trim()} |  | ${r[3].replace(/,/g,"")}`}
+    if(!L.includes("|")){let t=" "+L.replace(/(\d)\s*(?:u|unit|units)\b/gi,"$1")+" ";let gw=null;
+      const gm=t.match(new RegExp("\\s("+BT_GW+")(?=\\s)","i"));if(gm){gw=btOU(gm[1]);t=t.slice(0,gm.index)+" "+t.slice(gm.index+gm[0].length)}
+      const am=t.match(/\s([\d,]+(?:\.\d+)?)\s*$/)||t.match(/^\s*([\d,]+(?:\.\d+)?)\s/);if(!am)return;
+      const team=(t.slice(0,am.index)+" "+t.slice(am.index+am[0].length)).replace(/\s+/g," ").trim();if(!team||/^\d/.test(team))return;
+      L=`${btDefD()} | ${team} | ${gw?(gw==="over"?"Over":"Under"):team} |  | ${am[1].replace(/,/g,"")}`}
     if(!L.includes("|"))return;
     const f=L.split("|").map(x=>x.trim());if(f.length<5)return;
     const x={raw:L,orig:String(raw||"").trim(),ok:false,err:""};x.d=btDealer(f[0]);if(!x.d)x.err="ဒိုင် မသိ";
     let mt=f[1],hint=null;const tm=mt.match(/^(\d{1,2})[:.](\d{2})\s+(.*)$/);if(tm){hint=tm[1].padStart(2,"0")+":"+tm[2];mt=tm[3]}
     const vs=mt.replace(/\s*\.?\s*\b(?:vs|v|VS|Vs)\b\.?\s*/," vs ").split(" vs ");
     x.m=vs.length===2?vbFind(vs[0].trim(),vs[1].trim(),hint,C):btFind1(mt.trim(),C);if(!x.m&&!x.err)x.err="ပွဲ မတွေ့";
-    if(BT_G.test(f[2].trim()))f[2]=btOU(f[2])==="over"?"Over":"Under";
+    if(BT_G.test(f[2].trim())||btGP(f[2]))f[2]=btOU(f[2])==="over"?"Over":"Under";
     const pk=f[2].toLowerCase().replace(/^g\s*/,"").trim();
     x.mk=/^(over|o|ပေါ်|ဂိုးပေါ်|gover)$/.test(pk)?"goal":/^(under|u|အောက်|ဂိုးအောက်|gunder)$/.test(pk)?"goal":"body";
     if(x.mk==="goal")x.pick=/^(over|o|ပေါ်|ဂိုးပေါ်|gover)$/.test(pk)?"over":"under";
