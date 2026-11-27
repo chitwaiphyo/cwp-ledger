@@ -509,7 +509,7 @@ section.view svg{max-width:100%;height:auto}
       </div>
       <div class="row"><button class="primary" type="submit" id="mSave">မှတ်မည်</button><button class="ghost" type="button" id="mCancel" hidden>ပယ်ဖျက်</button><span class="small" id="mErr" style="color:var(--loss)"></span></div>
     </form></details>
-    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v27/11 20:30</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
+    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v27/11 20:45</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
     <div class="box-body" style="display:grid;gap:10px">
       <textarea id="vbText" rows="6" placeholder="Yar Win Soe ဆီက Viber စာကို ဒီမှာ Paste ချပါ&#10;ဥပမာ:&#10;9:45&#10;Racing vs Sociedad&#10;Sociedad -80/3-90&#10;Bilbao vs Espanyol Bilbao 1-30/3+20&#10;Change A Villa 1+50/3+40 Spur 1-10/3-20&#10;Hull vs Brighton 1(-32)A 3(50)u"></textarea>
       <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option><option value="bet">🎯 ထိုးစာရင်း</option></select><select id="vbDealer" style="width:auto" hidden title="ဒိုင်နာမည် မပါတဲ့ ထိုးစာ (ဥပမာ Racing 30000) အတွက် ဒိုင်"></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><label class="chk small" title="ကြေး/ရလဒ် မထည့်မိခဲ့တဲ့ ရက်ဟောင်းပွဲတွေပါ ရှာမယ်"><input type="checkbox" id="vbOld"> ရက် ၃၀ အတွင်း ပွဲဟောင်းပါ</label><button type="button" class="ghost" id="rsCopy" title="ရလဒ် မထည့်ရသေးတဲ့ ကန်ပြီးပွဲတွေကို ChatGPT အတွက် Copy ကူး">📤 ရလဒ်လိုတဲ့ပွဲ Copy</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
@@ -593,7 +593,7 @@ section.view svg{max-width:100%;height:auto}
       <button type="button" class="ghost" id="hClear">ရှင်းမည်</button>
     </div>
     <div class="kpis" id="hSum"></div>
-    <div class="small muted"><span class="giver">အနီရောင်</span> = ကြေးပေးအသင်း · ဘော်ဒီရလဒ်ကို ကြေးပေးသူဘက်ကကြည့်ပြီး ပြထားသည် (ပေးသူ = ပေးသူပေါက်၊ ယူသူ = ယူသူပေါက်) · အသင်းနာမည်ကိုနှိပ်ရင် အဲ့အသင်းပွဲတွေကိုပဲ ပြမယ်</div>
+    <div class="small muted"><span class="giver">အနီရောင်</span> = ကြေးပေးအသင်း · ဘော်ဒီရလဒ်: <b>အပေါ်ကြေး</b> = ကြေးပေးအသင်း အောင် · <b>အောက်ကြေး</b> = ကြေးပေးအသင်း ရှုံး (% = တစ်ဝက်/တစ်စိတ်) · အသင်းနာမည်ကိုနှိပ်ရင် အဲ့အသင်းပွဲတွေကိုပဲ ပြမယ်</div>
     <div class="tbl-wrap ledger" id="hList"></div>
     <div style="text-align:center"><button type="button" id="hMore">နောက်ထပ် ၁၀၀ ပွဲ ပြမည်</button></div>
   </section>
@@ -1017,7 +1017,7 @@ const MKT={body:"ဘော်ဒီ",goal:"ဂိုးပေါင်း",x12:"
 /* ---------- store: db capability + offline cache & write queue ---------- */
 const S={bets:[],dealers:[],payments:[],settings:[],matches:[],history:[],mode:"loading"};
 const COLS=["bets","dealers","payments","settings","matches","history"];
-const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="27/11 20:30";
+const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="27/11 20:45";
 const FB_CFG={apiKey:"AIzaSyCowWBBUMnp03gAxASeN-fWi_65XXHvL2o",authDomain:"cwp-ledger.firebaseapp.com",projectId:"cwp-ledger",storageBucket:"cwp-ledger.firebasestorage.app",messagingSenderId:"595192435834",appId:"1:595192435834:web:95d9892b256e44d26657c3"};const FB_UID="PtPXmvY7sZPUCX70XPLWHWqEqkb2";let FS=null;
 const SIMPLE=false;document.documentElement.classList.toggle("simple",SIMPLE);
 let db=null;const LS="kyay-ledger-v1",LC="kyay-cache-v1",LQ="kyay-queue-v1";
@@ -1821,7 +1821,7 @@ function allRecs(){
 function bodyF(r,line){const l=pml(line||r.body);if(!l||!r.giver)return null;return factorOf({market:"body",giver:r.giver,pick:r.giver,ball:l.ball,price:l.price},r.hg,r.ag)}
 function goalF(r,line){const l=pml(line||r.goal);if(!l)return null;return factorOf({market:"goal",pick:"over",ball:l.ball,price:l.price},r.hg,r.ag)}
 function bodyChip(f){if(f==null)return '<span class="muted small">—</span>';const p=Math.round(Math.abs(f)*100);
-  return f>=1?'<span class="chip win">ပေးသူ</span>':f>0?`<span class="chip win">ပေးသူ ${p}%</span>`:f===0?'<span class="chip push">အမ်း</span>':f>-1?`<span class="chip loss">ယူသူ ${p}%</span>`:'<span class="chip loss">ယူသူ</span>'}
+  return f>=1?'<span class="chip win">အပေါ်ကြေး</span>':f>0?`<span class="chip win">အပေါ်ကြေး ${p}%</span>`:f===0?'<span class="chip push">အမ်း</span>':f>-1?`<span class="chip loss">အောက်ကြေး ${p}%</span>`:'<span class="chip loss">အောက်ကြေး</span>'}
 function goalChip(f){if(f==null)return '<span class="muted small">—</span>';const p=Math.round(Math.abs(f)*100);
   return f>=1?'<span class="chip win">ပေါ်</span>':f>0?`<span class="chip win">ပေါ် ${p}%</span>`:f===0?'<span class="chip push">အမ်း</span>':f>-1?`<span class="chip loss">အောက် ${p}%</span>`:'<span class="chip loss">အောက်</span>'}
 function wpl(list){let w=0,p=0,l=0;list.forEach(f=>{if(f==null)return;if(f>0)w++;else if(f<0)l++;else p++});return {w,p,l,n:w+p+l,pct:(w+l)?w/(w+l):NaN}}
@@ -2221,7 +2221,7 @@ let SAMPLE=undefined,AI_BUSY=null,AI_FOR=null;
 const sideWord=(r,k)=>teamKey(r.home)===k?"H":"A";
 function recLine(r,k){const s=k?sideWord(r,k):"";const opp=k?(s==="H"?r.away:r.home):"";
   const bf=bodyF(r),gf=goalF(r);const gv=r.giver==="home"?r.home:r.giver==="away"?r.away:"";
-  const bres=bf==null?"":k?(r.giver===(s==="H"?"home":"away")?(bf>0?"ပေး-နိုင်":bf<0?"ပေး-ရှုံး":"အမ်း"):(bf<0?"ယူ-နိုင်":bf>0?"ယူ-ရှုံး":"အမ်း")):(bf>0?"ပေးသူနိုင်":bf<0?"ယူသူနိုင်":"အမ်း");
+  const bres=bf==null?"":bf>0?"အပေါ်ကြေး":bf<0?"အောက်ကြေး":"အမ်း";
   const gres=gf==null?"":gf>0?"ပေါ်":gf<0?"အောက်":"အမ်း";
   return k?`${r.date} ${s} vs ${opp} ${s==="H"?r.hg+"-"+r.ag:r.ag+"-"+r.hg}${r.body&&r.giver?` | body ${gv?gv+" ပေး ":""}${r.body} → ${bres}`:""}${r.goal?` | goal ${r.goal} → ${gres}`:""} [${r.league}]`
           :`${r.date} ${r.home} ${r.hg}-${r.ag} ${r.away}${r.body&&r.giver?` | body ${gv} ပေး ${r.body} → ${bres}`:""}${r.goal?` | goal ${r.goal} → ${gres}`:""}`;
@@ -2247,7 +2247,7 @@ function aiContext(m){
   const pk=pairKey(teamKey(m.home),teamKey(m.away));const h2h=recs.filter(r=>pairKey(teamKey(r.home),teamKey(r.away))===pk).slice(0,8);
   L.push(`\n## နှစ်သင်း ယခင်တွေ့ဆုံမှု (${h2h.length})`);h2h.forEach(r=>L.push("- "+recLine(r)));
   if(pl.body){const bl=fmtML(pl.body.ball,pl.body.price);const all=recs.filter(r=>r.body===bl&&r.giver);const o=wpl(all.map(r=>bodyF(r)));const lg=wpl(all.filter(r=>r.league===m.league).map(r=>bodyF(r)));
-    L.push(`\nဘော်ဒီ ${bl} ကြေးမျိုး မှတ်တမ်းထဲ: ပေးသူ နိုင်-အမ်း-ရှုံး ${o.w}-${o.p}-${o.l}; ဒီပြိုင်ပွဲမှာ ${lg.w}-${lg.p}-${lg.l}`)}
+    L.push(`\nဘော်ဒီ ${bl} ကြေးမျိုး မှတ်တမ်းထဲ: အပေါ်ကြေး-အမ်း-အောက်ကြေး ${o.w}-${o.p}-${o.l}; ဒီပြိုင်ပွဲမှာ ${lg.w}-${lg.p}-${lg.l}`)}
   if(pl.goal){const gl=fmtML(pl.goal.ball,pl.goal.price);const all=recs.filter(r=>r.goal===gl);const o=wpl(all.map(r=>goalF(r)));const lg=wpl(all.filter(r=>r.league===m.league).map(r=>goalF(r)));
     L.push(`ဂိုး ${gl} ကြေးမျိုး မှတ်တမ်းထဲ: ပေါ်-အမ်း-အောက် ${o.w}-${o.p}-${o.l}; ဒီပြိုင်ပွဲမှာ ${lg.w}-${lg.p}-${lg.l}`)}
   return L.join("\n");
@@ -2768,9 +2768,9 @@ function flCompare(m,text,label,c){
   if(pl.body&&c.fair!=null){const g=pl.body.giver;const gN=g==="home"?m.home:m.away,tN=g==="home"?m.away:m.home;
     const cur=200*pl.body.ball-pl.body.price;const fg=g==="home"?c.fair:-c.fair;const d=cur-fg;
     const bt=flBack(FLRECS);
-    const msg=Math.abs(d)<20?`<span class="chip push">သင့်တင့်</span> ကွာ ${Math.abs(Math.round(d))} ပြားပဲ${flBt(bt.mid,"ကြေးသင့်တင့်ခဲ့တဲ့")} <span class="small muted">(ပေးသူ ပေါက်-အမ်း-မပေါက်)</span>`
-      :d>0?`<span class="chip loss">ကြေးပြင်း</span> <b class="giver">${esc(gN)}</b> က ပေါက်သင့်ကြေးထက် <b class="num">${Math.round(d)}</b> ပြား ပိုပေးထား${flBt(bt.hi,"ကြေးပြင်းခဲ့တဲ့")} <span class="small muted">(ပေးသူ ပေါက်-အမ်း-မပေါက်)</span>`
-      :`<span class="chip win">ကြေးပျော့</span> <b class="giver">${esc(gN)}</b> က ပေါက်သင့်ကြေးထက် <b class="num">${Math.round(-d)}</b> ပြား လျော့ပေးထား${flBt(bt.lo,"ကြေးပျော့ခဲ့တဲ့")} <span class="small muted">(ပေးသူ ပေါက်-အမ်း-မပေါက်)</span>`;
+    const msg=Math.abs(d)<20?`<span class="chip push">သင့်တင့်</span> ကွာ ${Math.abs(Math.round(d))} ပြားပဲ${flBt(bt.mid,"ကြေးသင့်တင့်ခဲ့တဲ့")} <span class="small muted">(အပေါ်ကြေး-အမ်း-အောက်ကြေး)</span>`
+      :d>0?`<span class="chip loss">ကြေးပြင်း</span> <b class="giver">${esc(gN)}</b> က ပေါက်သင့်ကြေးထက် <b class="num">${Math.round(d)}</b> ပြား ပိုပေးထား${flBt(bt.hi,"ကြေးပြင်းခဲ့တဲ့")} <span class="small muted">(အပေါ်ကြေး-အမ်း-အောက်ကြေး)</span>`
+      :`<span class="chip win">ကြေးပျော့</span> <b class="giver">${esc(gN)}</b> က ပေါက်သင့်ကြေးထက် <b class="num">${Math.round(-d)}</b> ပြား လျော့ပေးထား${flBt(bt.lo,"ကြေးပျော့ခဲ့တဲ့")} <span class="small muted">(အပေါ်ကြေး-အမ်း-အောက်ကြေး)</span>`;
     const why=(()=>{const ha=hadv(m.league);const n=c.fair-ha;const NB={home:m.home,away:m.away};
       const parts=[];if(c.fairC!=null)parts.push(`ကြားခံအသင်းနဲ့ယှဉ် ${flLine(c.fairC-ha,NB)}`);if(c.fairR!=null)parts.push(`အဆင့်နဲ့ ${flLine(c.fairR-ha,NB)}`);if(!parts.length&&c.fairP!=null)parts.push(`ရဂိုး/ပေးဂိုးနဲ့ ${flLine(c.fairP-ha,NB)}`);
       const flip=(g==="home")!==(c.fair>=0)&&Math.abs(c.fair)>=10;
@@ -3123,7 +3123,7 @@ function renderMatches(){
     const lh=lhHtml(m);const lhr=lh?`<tr class="mrow sub lhrow" data-id="${esc(m.id)}"><td colspan="${ncol}">${lh}</td></tr>`:"";
     const qbr=openHist.has("b:"+m.id)?`<tr class="mrow sub qbrow" data-id="${esc(m.id)}"><td colspan="${ncol}">${qbHtml(m)}</td></tr>`:"";
     return dayRow+main+qbr+sub}).join("")}</tbody></table></div>
-    <div class="small muted" style="margin-top:6px"><span class="giver">အနီရောင်</span> = ကြေးပေးအသင်း · ခေါင်းစဉ်ကိုနှိပ်ရင် စီမယ် · အတန်းကိုနှိပ်ရင် ပွဲအသေးစိတ်<br>ကြေးအောက်က အမှတ်အသား = Yar Win Soe ကြေး (မရှိရင် Internet ကြေး) ကို ပေါက်သင့်ကြေးနဲ့ ယှဉ်ချက် · ပြင်း/ပျော့ N = ပေါက်သင့်ထက် N ပြား ပိုပေး/လျော့ပေး · မြင့်/နိမ့် = ဂိုးကြေး · ✓/✗ = ပွဲပြီး ပေးသူ(ဘော်ဒီ)/အပေါ်(ဂိုး) ပေါက်/မပေါက်</div>`;
+    <div class="small muted" style="margin-top:6px"><span class="giver">အနီရောင်</span> = ကြေးပေးအသင်း · ခေါင်းစဉ်ကိုနှိပ်ရင် စီမယ် · အတန်းကိုနှိပ်ရင် ပွဲအသေးစိတ်<br>ကြေးအောက်က အမှတ်အသား = Yar Win Soe ကြေး (မရှိရင် Internet ကြေး) ကို ပေါက်သင့်ကြေးနဲ့ ယှဉ်ချက် · ပြင်း/ပျော့ N = ပေါက်သင့်ထက် N ပြား ပိုပေး/လျော့ပေး · မြင့်/နိမ့် = ဂိုးကြေး · ✓/✗ = ပွဲပြီး ဘော်ဒီ အပေါ်ကြေး/အောက်ကြေး · ဂိုး ပေါ်/အောက်</div>`;
   try{flqFill()}catch(e){}
 }
 $("#mStatus").addEventListener("change",e=>{MV.status=e.target.value;mvSave();renderMatches()});
@@ -3512,7 +3512,7 @@ function renderStats(){
   $("#byDealer").innerHTML=groupTable(done,r=>esc(dealerName(r.b.dealerId)),"ဒိုင်");
   $("#byLeague").innerHTML=groupTable(done,r=>esc(r.b.league),"ပြိုင်ပွဲ");
   $("#byLine").innerHTML=groupTable(done,r=>`${MKT[r.b.market]} <span class="line-tag">${esc(lineLabel(r.b))}</span>`,"ကြေး");
-  $("#bySide").innerHTML=groupTable(done,r=>r.b.market==="body"?(r.b.pick===r.b.giver?"ပေးသူဘက် (အပေါ်)":"ယူသူဘက် (အောက်)"):r.b.market==="goal"?(r.b.pick==="over"?"ဂိုးပေါ်":"ဂိုးအောက်"):r.b.market==="btts"?(r.b.pick==="yes"?"BTTS Yes":"BTTS No"):(r.b.pick==="draw"?"1X2 သရေ":r.b.pick==="home"?"1X2 အိမ်":"1X2 အဝေး"),"ထိုးဘက်");
+  $("#bySide").innerHTML=groupTable(done,r=>r.b.market==="body"?(r.b.pick===r.b.giver?"အပေါ်ကြေးဘက် (ကြေးပေး)":"အောက်ကြေးဘက် (ကြေးယူ)"):r.b.market==="goal"?(r.b.pick==="over"?"ဂိုးပေါ်":"ဂိုးအောက်"):r.b.market==="btts"?(r.b.pick==="yes"?"BTTS Yes":"BTTS No"):(r.b.pick==="draw"?"1X2 သရေ":r.b.pick==="home"?"1X2 အိမ်":"1X2 အဝေး"),"ထိုးဘက်");
   $("#byMarket").innerHTML=groupTable(done,r=>MKT[r.b.market],"ကစားပုံ");
   $("#byMonth").innerHTML=groupTable(done,r=>esc((r.b.date||"").slice(0,7)),"လ");
 }
