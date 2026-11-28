@@ -509,7 +509,7 @@ section.view svg{max-width:100%;height:auto}
       </div>
       <div class="row"><button class="primary" type="submit" id="mSave">မှတ်မည်</button><button class="ghost" type="button" id="mCancel" hidden>ပယ်ဖျက်</button><span class="small" id="mErr" style="color:var(--loss)"></span></div>
     </form></details>
-    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v28/11 21:30</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
+    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v28/11 21:40</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
     <div class="box-body" style="display:grid;gap:10px">
       <textarea id="vbText" rows="6" placeholder="Yar Win Soe ဆီက Viber စာကို ဒီမှာ Paste ချပါ&#10;ဥပမာ:&#10;9:45&#10;Racing vs Sociedad&#10;Sociedad -80/3-90&#10;Bilbao vs Espanyol Bilbao 1-30/3+20&#10;Change A Villa 1+50/3+40 Spur 1-10/3-20&#10;Hull vs Brighton 1(-32)A 3(50)u"></textarea>
       <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option><option value="bet">🎯 ထိုးစာရင်း</option></select><select id="vbDealer" style="width:auto" hidden title="ဒိုင်နာမည် မပါတဲ့ ထိုးစာ (ဥပမာ Racing 30000) အတွက် ဒိုင်"></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><label class="chk small" title="ကြေး/ရလဒ် မထည့်မိခဲ့တဲ့ ရက်ဟောင်းပွဲတွေပါ ရှာမယ်"><input type="checkbox" id="vbOld"> ရက် ၃၀ အတွင်း ပွဲဟောင်းပါ</label><button type="button" class="ghost" id="rsClean" title="ChatGPT ရလဒ်မပေးတဲ့ ပွဲတွေကို ရလဒ်မလို လို့ မှတ်/ဖျက်">🧹 ရလဒ်မရ ပွဲ</button><button type="button" class="ghost" id="rsCopy" title="ရလဒ် မထည့်ရသေးတဲ့ ကန်ပြီးပွဲတွေကို ChatGPT အတွက် Copy ကူး">📤 ရလဒ်လိုတဲ့ပွဲ Copy</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
@@ -1021,7 +1021,7 @@ const MKT={body:"ဘော်ဒီ",goal:"ဂိုးပေါင်း",x12:"
 /* ---------- store: db capability + offline cache & write queue ---------- */
 const S={bets:[],dealers:[],payments:[],settings:[],matches:[],history:[],mode:"loading"};
 const COLS=["bets","dealers","payments","settings","matches","history"];
-const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="28/11 21:30";
+const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="28/11 21:40";
 const FB_CFG={apiKey:"AIzaSyCowWBBUMnp03gAxASeN-fWi_65XXHvL2o",authDomain:"cwp-ledger.firebaseapp.com",projectId:"cwp-ledger",storageBucket:"cwp-ledger.firebasestorage.app",messagingSenderId:"595192435834",appId:"1:595192435834:web:95d9892b256e44d26657c3"};const FB_UID="PtPXmvY7sZPUCX70XPLWHWqEqkb2";let FS=null;
 const SIMPLE=false;document.documentElement.classList.toggle("simple",SIMPLE);
 let db=null;const LS="kyay-ledger-v1",LC="kyay-cache-v1",LQ="kyay-queue-v1";
@@ -1697,8 +1697,9 @@ function parseLine(text,home,away){
   const tok=/(?:^|\s)((?:\d+(?:\.\d+)?)?\s*[+\-−–]\s*\d{1,3}|\d+(?:\.\d+)?\s*=|=)\s*(?:\(.*?\))?$/;
   for(const sg of segs){
     if(/btts|gg\b|နှစ်သင်းလုံး/i.test(sg)){const y=sg.match(/yes\s*(\d+(?:\.\d+)?)/i),n=sg.match(/no\s*(\d+(?:\.\d+)?)/i);out.btts={yes:y?+y[1]:null,no:n?+n[1]:null};continue}
-    const m=sg.match(tok);if(!m)continue;const l=pml(m[1]);if(!l)continue;
-    const low=norm(sg);const name=norm(sg.slice(0,m.index));
+    let pre="",rest=sg;for(const t of [home,away].filter(Boolean).sort((x,y)=>y.length-x.length)){const rx=new RegExp("^\\s*"+String(t).trim().replace(/[.*+?^${}()|[\]\\]/g,"\\$&").replace(/\s+/g,"\\s+")+"(?=\\s|$)","i");const mm=sg.match(rx);if(mm){pre=mm[0];rest=sg.slice(mm[0].length);break}}
+    const m=rest.match(tok);if(!m)continue;const l=pml(m[1]);if(!l)continue;
+    const low=norm(sg);const name=norm(pre+rest.slice(0,m.index));
     const tHit=!!name&&[H,A].some(t=>t&&(t===name||(name.length>=4&&t.includes(name))||(t.length>=4&&name.includes(t))));
     const isGoal=!tHit&&/ဂိုး|ပေါ်|အောက်|(?:^|\s)(?:goal|o\/u|over|under|g|ou)(?:\s|$)/.test(name||low);
     if(isGoal){if(!out.goal)out.goal=l;continue}
@@ -3267,7 +3268,7 @@ function vbParse(text){const out=[];let hint=null,pair=null;
     if(vs&&!VB_LN.test(vs[1])){const left=vs[1].trim();let right=vs[2].trim();
       let lm=right.match(new RegExp("^(.*?)\\s*"+VB_LN.source+"\\s*$"));if(lm)lm={pre:lm[1],body:lm[2],goal:lm[3]};
       if(!lm){const sp=right.match(VB_SP);if(sp)lm={pre:sp[1],body:sp[2],goal:sp[3]}}
-      if(!lm){const on=right.match(VB_ONE);if(on&&/\d/.test(on[2]))lm={pre:on[1],body:on[2],goal:""}}
+      if(!lm){const on=right.match(VB_ONE);if(on&&/\d/.test(on[2])&&/[+\-=]/.test(on[2]))lm={pre:on[1],body:on[2],goal:""}}
       if(!lm){pair={home:left,away:right,hint,src:it.src,date:it.date,league:it.league};continue}
       const pre=lm.pre.trim().split(" ").filter(Boolean);let best=null;
       for(let k=1;k<pre.length;k++){const away=pre.slice(0,k).join(" "),g=pre.slice(k).join(" ");const sc=Math.max(vbTeamScore(g,left),vbTeamScore(g,away));if(!best||sc>best.sc)best={away,g,sc}}
