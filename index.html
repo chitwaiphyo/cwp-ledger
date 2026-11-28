@@ -509,7 +509,7 @@ section.view svg{max-width:100%;height:auto}
       </div>
       <div class="row"><button class="primary" type="submit" id="mSave">မှတ်မည်</button><button class="ghost" type="button" id="mCancel" hidden>ပယ်ဖျက်</button><span class="small" id="mErr" style="color:var(--loss)"></span></div>
     </form></details>
-    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v27/11 21:10</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
+    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v28/11 18:00</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
     <div class="box-body" style="display:grid;gap:10px">
       <textarea id="vbText" rows="6" placeholder="Yar Win Soe ဆီက Viber စာကို ဒီမှာ Paste ချပါ&#10;ဥပမာ:&#10;9:45&#10;Racing vs Sociedad&#10;Sociedad -80/3-90&#10;Bilbao vs Espanyol Bilbao 1-30/3+20&#10;Change A Villa 1+50/3+40 Spur 1-10/3-20&#10;Hull vs Brighton 1(-32)A 3(50)u"></textarea>
       <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option><option value="bet">🎯 ထိုးစာရင်း</option></select><select id="vbDealer" style="width:auto" hidden title="ဒိုင်နာမည် မပါတဲ့ ထိုးစာ (ဥပမာ Racing 30000) အတွက် ဒိုင်"></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><label class="chk small" title="ကြေး/ရလဒ် မထည့်မိခဲ့တဲ့ ရက်ဟောင်းပွဲတွေပါ ရှာမယ်"><input type="checkbox" id="vbOld"> ရက် ၃၀ အတွင်း ပွဲဟောင်းပါ</label><button type="button" class="ghost" id="rsCopy" title="ရလဒ် မထည့်ရသေးတဲ့ ကန်ပြီးပွဲတွေကို ChatGPT အတွက် Copy ကူး">📤 ရလဒ်လိုတဲ့ပွဲ Copy</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
@@ -1021,7 +1021,7 @@ const MKT={body:"ဘော်ဒီ",goal:"ဂိုးပေါင်း",x12:"
 /* ---------- store: db capability + offline cache & write queue ---------- */
 const S={bets:[],dealers:[],payments:[],settings:[],matches:[],history:[],mode:"loading"};
 const COLS=["bets","dealers","payments","settings","matches","history"];
-const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="27/11 21:10";
+const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="28/11 18:00";
 const FB_CFG={apiKey:"AIzaSyCowWBBUMnp03gAxASeN-fWi_65XXHvL2o",authDomain:"cwp-ledger.firebaseapp.com",projectId:"cwp-ledger",storageBucket:"cwp-ledger.firebasestorage.app",messagingSenderId:"595192435834",appId:"1:595192435834:web:95d9892b256e44d26657c3"};const FB_UID="PtPXmvY7sZPUCX70XPLWHWqEqkb2";let FS=null;
 const SIMPLE=false;document.documentElement.classList.toggle("simple",SIMPLE);
 let db=null;const LS="kyay-ledger-v1",LC="kyay-cache-v1",LQ="kyay-queue-v1";
@@ -3357,7 +3357,9 @@ function rsCands(){const now=Date.now(),d=vbOld()?31:8;return S.matches.filter(m
 function rsParse(text){const out=[];let hint=null;const C=rsCands();
   String(text||"").split(/\r?\n|;/).forEach(raw=>{let L=String(raw||"").replace(/[၀-၉]/g,c=>String(c.charCodeAt(0)-0x1040)).replace(/[−–—]/g,"-").replace(/ /g," ");
     L=L.replace(/\([^)]*\)|\[[^\]]*\]/g," ").replace(/\b(?:FT|AET|AP|HT|Full ?time|ပြီး)\b\.?/gi," ");
-    L=L.replace(/^\s*(?:\d{1,2}[.)]|[-•*►➤▪●◆✅❌➖⚽️]+)\s+(?=\D)/u,"").replace(/\s+/g," ").trim();
+    L=L.replace(/^\s*(?:\d{1,2}[.)]|[-•*►➤▪●◆✅❌➖⚽️]+)\s+(?=\D)/u,"").replace(/`+/g," ").replace(/\s+/g," ").trim();
+    if(/^results?:?$/i.test(L))return;
+    L=L.replace(/^(?:NET|YWS|Yar)\s+/i,"").replace(/^\d{1,2}\/\d{1,2}(?:\/\d{2,4})?\s+/,"").trim();
     const tm=L.match(/^(\d{1,2})[:.](\d{2})\s+(.*)$/);if(tm){hint=tm[1].padStart(2,"0")+":"+tm[2];L=tm[3]}
     L=L.replace(/\s*\.?\s*\b(?:vs|v|VS|Vs)\b\.?\s*/g," vs ").replace(/\s+(?:x|×|နဲ့|နှင့်)\s+/g," vs ").trim();if(!L)return;
     let h,a,hg,ag,r;
@@ -3397,7 +3399,9 @@ function vbRender(){const el=$("#vbPrev");if(!VB.length){el.innerHTML='<p class=
       <td><input type="checkbox" data-vbon="${i}" ${x.ok&&(padL(cur)!==padL(line)||fx)?"checked":""} ${x.ok?"":"disabled"}></td></tr>`}).join("")}</tbody></table>
     <div class="row" style="margin-top:8px"><button type="button" class="primary" id="vbApply">✓ ရွေးထားတာ ထည့်မည်</button><span class="small muted">${VB.filter(x=>x.ok).length}/${VB.length} ကြောင်း · Yar ${VB.filter(x=>vbTgt(x)==="yws").length} · Internet ${VB.filter(x=>vbTgt(x)==="net").length}${VB.some(x=>x.nw&&!x.m)?` · ➕ ပွဲသစ် ${VB.filter(x=>x.nw&&!x.m).length}`:""}</span></div>`;
   VB.forEach((x,i)=>{const s=el.querySelector(`[data-vbm="${i}"]`);if(s&&x.m)s.value=x.m.id})}
-function vbAutoTarget(){const ta=$("#vbText");const ls=ta.value.split(/\r?\n/);let y=0,n=0;
+const RS_LINE=/^\s*(?:\d{1,2}[.)]\s*)?(?:\d{1,2}\/\d{1,2}(?:\/\d{2,4})?\s+)?(?:\d{1,2}[:.]\d{2}\s+)?(?:\[[^\]]*\]\s*)?[^|\/\d][^|\/]*?\s+(?:vs\.?|v|VS|Vs)\s+[^|\/]+?\s+\d{1,2}\s*[-:–]\s*\d{1,2}\s*(?:\([^)]*\)|FT|AET|pens?)?\s*$/i;
+function vbLooksRes(t){const L=String(t||"").split(/\r?\n/).map(x=>x.trim()).filter(x=>x&&!/^results?$/i.test(x)&&!/^```/.test(x));if(!L.length||L.some(x=>x.replace(/^\s*(?:NET|YWS)?\s*\d{1,2}\/\d{1,2}(?:\/\d{2,4})?\s+/i,"").includes("/")))return false;return L.filter(x=>RS_LINE.test(x)).length>=Math.max(1,Math.ceil(L.length*0.6))}
+function vbAutoTarget(){const ta=$("#vbText");{const sel=$("#vbTarget");if(sel.value!=="bet"&&vbLooksRes(ta.value)&&sel.value!=="res"){sel.value="res";try{localStorage.setItem("kyay-vbtgt","res")}catch(e){}btDealerFill&&btDealerFill();toast("ရလဒ်စာလို့ သိလို့ ⚽ ပွဲပြီး ရလဒ် ကို ရွေးပေးလိုက်ပါတယ်");return}}const ls=ta.value.split(/\r?\n/);let y=0,n=0;
   const out=ls.map(l=>{const r=l.match(/^\s*(NET|Internet|108sode|iBet|YWS|Yar(?:\s*Win\s*Soe)?)\s*[:|\-]?\s+(?=\d{1,2}[:.]\d{2}|\D)/i);if(!r)return l;
     if(/^(yws|yar)/i.test(r[1]))y++;else n++;return l.slice(r[0].length)});
   if(!y&&!n&&/close\s*time/i.test(ta.value)){const sel=$("#vbTarget");if(sel.value==="net"){sel.value="yws";try{localStorage.setItem("kyay-vbtgt","yws")}catch(e){}}return}
@@ -3415,7 +3419,8 @@ $("#rsCopy").addEventListener("click",async()=>{const now=Date.now();
   const t="results\n"+L.map(m=>`${m.home} vs ${m.away} (${ddmm(m.date)} ${m.time||""} Myanmar time, ${m.league||""})`).join("\n");
   let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(e){}
   if(!ok){$("#vbText").value=t;$("#vbText").select();try{ok=document.execCommand("copy")}catch(e){}}
-  toast(ok?`${L.length} ပွဲ Copy ကူးပြီး — ChatGPT မှာ Paste ချပါ`:"Copy မရပါ — အကွက်ထဲက စာကို ကိုယ်တိုင် ကူးပါ")});
+  $("#vbTarget").value="res";try{localStorage.setItem("kyay-vbtgt","res")}catch(e){}btDealerFill();if(ok){$("#vbText").value="";$("#vbPrev").innerHTML=""}
+  toast(ok?`${L.length} ပွဲ Copy ကူးပြီး — ChatGPT မှာ Paste ချပါ (ပြန်ရတဲ့စာကို ဒီအကွက်မှာ ထည့်ပါ)`:"Copy မရပါ — အကွက်ထဲက စာကို ကိုယ်တိုင် ကူးပါ")});
 $("#vbClear").addEventListener("click",()=>{$("#vbText").value="";VB=[];$("#vbPrev").innerHTML=""});
 $("#vbPrev").addEventListener("change",e=>{const sd=e.target.closest("[data-btd]");if(sd&&isBet()){const i=+sd.dataset.btd;const x=VB[i];const t=x.raw.split("|");t[0]="@"+sd.value+" ";VB[i]=btParse(t.join("|"))[0]||x;btRender();return}
   const s=e.target.closest("[data-vbm]");if(!s)return;const x=VB[+s.dataset.vbm];if(isBet()){const raw=x.raw;const m=S.matches.find(z=>z.id===s.value);if(m){const t=raw.split("|");t[1]=` ${m.time||""} ${m.home} vs ${m.away} `;VB[+s.dataset.vbm]=btParse(t.join("|"))[0]||x;}btRender();return}if(isRes()){x.m=S.matches.find(m=>m.id===s.value)||null;x.ok=!!x.m;rsRender();return}x.m=S.matches.find(m=>m.id===s.value)||null;x.side=x.m?(x.forceSide||(x.giver?vbGiverSide(x.m,x.giver):"home")):null;x.ok=!!x.m&&x.b!=null&&x.b!==""&&x.g!=null;vbRender()});
