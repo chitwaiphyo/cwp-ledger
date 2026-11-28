@@ -509,7 +509,7 @@ section.view svg{max-width:100%;height:auto}
       </div>
       <div class="row"><button class="primary" type="submit" id="mSave">မှတ်မည်</button><button class="ghost" type="button" id="mCancel" hidden>ပယ်ဖျက်</button><span class="small" id="mErr" style="color:var(--loss)"></span></div>
     </form></details>
-    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v28/11 18:30</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
+    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v28/11 20:45</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
     <div class="box-body" style="display:grid;gap:10px">
       <textarea id="vbText" rows="6" placeholder="Yar Win Soe ဆီက Viber စာကို ဒီမှာ Paste ချပါ&#10;ဥပမာ:&#10;9:45&#10;Racing vs Sociedad&#10;Sociedad -80/3-90&#10;Bilbao vs Espanyol Bilbao 1-30/3+20&#10;Change A Villa 1+50/3+40 Spur 1-10/3-20&#10;Hull vs Brighton 1(-32)A 3(50)u"></textarea>
       <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option><option value="bet">🎯 ထိုးစာရင်း</option></select><select id="vbDealer" style="width:auto" hidden title="ဒိုင်နာမည် မပါတဲ့ ထိုးစာ (ဥပမာ Racing 30000) အတွက် ဒိုင်"></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><label class="chk small" title="ကြေး/ရလဒ် မထည့်မိခဲ့တဲ့ ရက်ဟောင်းပွဲတွေပါ ရှာမယ်"><input type="checkbox" id="vbOld"> ရက် ၃၀ အတွင်း ပွဲဟောင်းပါ</label><button type="button" class="ghost" id="rsClean" title="ChatGPT ရလဒ်မပေးတဲ့ ပွဲတွေကို ရလဒ်မလို လို့ မှတ်/ဖျက်">🧹 ရလဒ်မရ ပွဲ</button><button type="button" class="ghost" id="rsCopy" title="ရလဒ် မထည့်ရသေးတဲ့ ကန်ပြီးပွဲတွေကို ChatGPT အတွက် Copy ကူး">📤 ရလဒ်လိုတဲ့ပွဲ Copy</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
@@ -1021,7 +1021,7 @@ const MKT={body:"ဘော်ဒီ",goal:"ဂိုးပေါင်း",x12:"
 /* ---------- store: db capability + offline cache & write queue ---------- */
 const S={bets:[],dealers:[],payments:[],settings:[],matches:[],history:[],mode:"loading"};
 const COLS=["bets","dealers","payments","settings","matches","history"];
-const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="28/11 18:30";
+const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="28/11 20:45";
 const FB_CFG={apiKey:"AIzaSyCowWBBUMnp03gAxASeN-fWi_65XXHvL2o",authDomain:"cwp-ledger.firebaseapp.com",projectId:"cwp-ledger",storageBucket:"cwp-ledger.firebasestorage.app",messagingSenderId:"595192435834",appId:"1:595192435834:web:95d9892b256e44d26657c3"};const FB_UID="PtPXmvY7sZPUCX70XPLWHWqEqkb2";let FS=null;
 const SIMPLE=false;document.documentElement.classList.toggle("simple",SIMPLE);
 let db=null;const LS="kyay-ledger-v1",LC="kyay-cache-v1",LQ="kyay-queue-v1";
@@ -1800,7 +1800,17 @@ function pml(v){
 }
 function normTeam(x){x=String(x||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/\(n\)/g," ");x=x.replace(/[.'’\/\-]/g," ").replace(/\butd\b/g,"united").replace(/\b(fc|afc|cf|sc|cd|ud|sd|vfb|vfl|tsg)\b/g,"");return x.replace(/\s+/g," ").trim()}
 function histMeta(){return S.history.find(d=>d.id==="meta")||{}}
-function teamKey(x){const k=normTeam(x);const a=histMeta().alias||{};return a[k]||k}
+let TK_SET=null,TK_SIG="",TK_MEMO=new Map();
+function tkKnown(){const sig=S.history.length+":"+S.history.reduce((n,h)=>n+((h.rows&&h.rows.length)||0),0)+":"+S.matches.length;if(TK_SET&&TK_SIG===sig)return TK_SET;
+  const a=histMeta().alias||{};const k0=t=>{const k=normTeam(t);return a[k]||k};const st=new Set();
+  S.history.forEach(h=>(h.rows||[]).forEach(r=>{st.add(k0(r[3]));st.add(k0(r[4]))}));S.matches.forEach(m=>{if(m.hg!=null&&m.hg!==""){st.add(k0(m.home));st.add(k0(m.away))}});
+  TK_SET=st;TK_SIG=sig;TK_MEMO=new Map();return st}
+const TK_STRIP=/\b(calcio|club|football|futbol|futebol|ssc|ss|ssd|us|as|ac|afc|cfc|sv|bk|if|fk|sk|nk|kv|krc|rcd|rc|real club|1846|1860|1893|1899|1900|1901|1903|1904|1905|1906|1907|1908|1909|1910|1911|1912|1913|1919|04|05|09)\b/g;
+function teamKey(x){const k=normTeam(x);const a=histMeta().alias||{};const k1=a[k]||k;
+  let st;try{st=tkKnown()}catch(e){return k1}if(st.has(k1))return k1;if(TK_MEMO.has(k1))return TK_MEMO.get(k1);
+  let r=k1;const k2=k1.replace(TK_STRIP," ").replace(/\s+/g," ").trim();const c2=a[k2]||k2;
+  if(k2&&k2!==k1&&st.has(c2))r=c2;
+  TK_MEMO.set(k1,r);return r}
 let HC={key:"",rows:[],teams:{},leagues:[],seasons:[]};
 function H(){
   const ds=S.history.filter(d=>Array.isArray(d.rows));const key=ds.map(d=>d.id+":"+d.rows.length).join(",")+"|"+Object.keys(histMeta().alias||{}).length;
