@@ -509,7 +509,7 @@ section.view svg{max-width:100%;height:auto}
       </div>
       <div class="row"><button class="primary" type="submit" id="mSave">မှတ်မည်</button><button class="ghost" type="button" id="mCancel" hidden>ပယ်ဖျက်</button><span class="small" id="mErr" style="color:var(--loss)"></span></div>
     </form></details>
-    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v28/11 22:30</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
+    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v28/11 22:45</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
     <div class="box-body" style="display:grid;gap:10px">
       <textarea id="vbText" rows="6" placeholder="Yar Win Soe ဆီက Viber စာကို ဒီမှာ Paste ချပါ&#10;ဥပမာ:&#10;9:45&#10;Racing vs Sociedad&#10;Sociedad -80/3-90&#10;Bilbao vs Espanyol Bilbao 1-30/3+20&#10;Change A Villa 1+50/3+40 Spur 1-10/3-20&#10;Hull vs Brighton 1(-32)A 3(50)u"></textarea>
       <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option><option value="bet">🎯 ထိုးစာရင်း</option></select><select id="vbDealer" style="width:auto" hidden title="ဒိုင်နာမည် မပါတဲ့ ထိုးစာ (ဥပမာ Racing 30000) အတွက် ဒိုင်"></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><label class="chk small" title="ကြေး/ရလဒ် မထည့်မိခဲ့တဲ့ ရက်ဟောင်းပွဲတွေပါ ရှာမယ်"><input type="checkbox" id="vbOld"> ရက် ၃၀ အတွင်း ပွဲဟောင်းပါ</label><button type="button" class="ghost" id="rsClean" title="ChatGPT ရလဒ်မပေးတဲ့ ပွဲတွေကို ရလဒ်မလို လို့ မှတ်/ဖျက်">🧹 ရလဒ်မရ ပွဲ</button><button type="button" class="ghost" id="rsCopy" title="ရလဒ် မထည့်ရသေးတဲ့ ကန်ပြီးပွဲတွေကို ChatGPT အတွက် Copy ကူး">📤 ရလဒ်လိုတဲ့ပွဲ Copy</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
@@ -1021,7 +1021,7 @@ const MKT={body:"ဘော်ဒီ",goal:"ဂိုးပေါင်း",x12:"
 /* ---------- store: db capability + offline cache & write queue ---------- */
 const S={bets:[],dealers:[],payments:[],settings:[],matches:[],history:[],mode:"loading"};
 const COLS=["bets","dealers","payments","settings","matches","history"];
-const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="28/11 22:30";
+const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="28/11 22:45";
 const FB_CFG={apiKey:"AIzaSyCowWBBUMnp03gAxASeN-fWi_65XXHvL2o",authDomain:"cwp-ledger.firebaseapp.com",projectId:"cwp-ledger",storageBucket:"cwp-ledger.firebasestorage.app",messagingSenderId:"595192435834",appId:"1:595192435834:web:95d9892b256e44d26657c3"};const FB_UID="PtPXmvY7sZPUCX70XPLWHWqEqkb2";let FS=null;
 const SIMPLE=false;document.documentElement.classList.toggle("simple",SIMPLE);
 let db=null;const LS="kyay-ledger-v1",LC="kyay-cache-v1",LQ="kyay-queue-v1";
@@ -1906,7 +1906,7 @@ function teamPanel(team,recs,key,curLeague){
 $("#mdBody").addEventListener("change",e=>{const s=e.target.closest("[data-tp-set]");if(!s)return;tpState(s.dataset.tp)[s.dataset.tpSet]=s.value;renderMatchDetail()});
 $("#mdBody").addEventListener("click",e=>{const h=e.target.closest("[data-tp-sort]");if(!h)return;const st=tpState(h.dataset.tp);const k=h.dataset.tpSort;if(st.sort===k)st.dir*=-1;else{st.sort=k;st.dir=k==="opp"?1:-1}renderMatchDetail()});
 function sameLinePanel(m,recs){
-  const pl=parseLine(m.line,m.home,m.away);if(!pl.body&&!pl.goal)return "";
+  const pl=flqPL(m);if(!pl.body&&!pl.goal)return "";
   const bl=pl.body?fmtML(pl.body.ball,pl.body.price):null,gl=pl.goal?fmtML(pl.goal.ball,pl.goal.price):null;
   const rows=[];
   if(bl){const all=recs.filter(r=>r.body===bl&&r.giver);const lg=all.filter(r=>r.league===m.league);
@@ -2004,7 +2004,7 @@ function renderMatchDetail(){
   el.innerHTML=`
   <div class="md-hero panel">
     <div class="small muted">${lgTag(m.league)} · <span class="num">${esc(m.date)}${m.time?" "+esc(m.time):""}</span>${m.date===today()?' <span class="chip pending">ယနေ့</span>':""}${m.example?' <span class="chip ex">နမူနာ</span>':""}</div>
-    <div class="md-teams"><span class="${parseLine(m.line,m.home,m.away).body?.giver==="home"?"giver":""}">${esc(m.home)}</span><span class="md-score">${m.hg!=null?`${m.hg}<i>–</i>${m.ag}`:"vs"}</span><span class="${parseLine(m.line,m.home,m.away).body?.giver==="away"?"giver":""}">${esc(m.away)}</span></div>
+    <div class="md-teams"><span class="${mGiver(m)==="home"?"giver":""}">${esc(m.home)}</span><span class="md-score">${m.hg!=null?`${m.hg}<i>–</i>${m.ag}`:"vs"}</span><span class="${mGiver(m)==="away"?"giver":""}">${esc(m.away)}</span></div>
     ${m.hg==null?`<div class="score-in" style="justify-content:center"><input type="number" min="0" inputmode="numeric" id="mdH" aria-label="${esc(m.home)} ဂိုး"><span>–</span><input type="number" min="0" inputmode="numeric" id="mdA" aria-label="${esc(m.away)} ဂိုး"><button type="button" class="primary" data-md="res">ရလဒ် မှတ်မည်</button></div>`:`<div style="text-align:center"><button type="button" class="ghost" data-md="reopen">ရလဒ် ပြန်ပြင်မည်</button></div>`}
     <div class="row" style="justify-content:center;gap:6px;flex-wrap:wrap">${m.line?`<span class="small muted">Internet</span> <span class="line-tag">${esc(m.line)}</span>`:""}${(()=>{const y=ahaDealerDefault();const t=y?dLine(m,y):"";return t&&t!==m.line?` <span class="small muted">${esc(dealerName(y))}</span> <span class="line-tag">${esc(t)}</span>`:""})()}</div>
     <div class="row" style="justify-content:center"><button type="button" class="primary" data-md="bet">+ ဒီပွဲကို ထိုးမည်</button><button type="button" data-md="edit">ပွဲပြင်</button></div>
@@ -2876,7 +2876,7 @@ function fairPanel(m,recs){
 $("#mdBody").addEventListener("change",e=>{if(e.target.id==="fgN"){FGN=+e.target.value||5;try{localStorage.setItem("kyay-fgn",FGN)}catch(_){}renderMatchDetail()}});
 $("#mdBody").addEventListener("change",e=>{if(e.target.id==="flN"){FLN=+e.target.value||20;try{localStorage.setItem("kyay-fln",FLN)}catch(_){}renderMatchDetail()}});
 function modelPanel(m,recs){
-  const d=modelData(m,recs,MDN);const c=modelCalc(d);const pl=parseLine(m.line,m.home,m.away);
+  const d=modelData(m,recs,MDN);const c=modelCalc(d);const pl=flqPL(m);
   const pc=x=>(x*100).toFixed(0)+"%";const fo=x=>x>0?(1/x).toFixed(2):"—";
   const evTxt=v=>`<b class="num ${v>0.02?"pos":v<-0.02?"neg":""}">${v>=0?"+":""}${(v*100).toFixed(0)}</b>`;
   const lines=[];
@@ -2912,7 +2912,7 @@ $("#mdBody").addEventListener("change",e=>{if(e.target.id==="mdN"){MDN=e.target.
 $("#mdBody").addEventListener("click",e=>{const b=e.target.closest('[data-md="model"]');if(!b)return;const m=S.matches.find(x=>x.id===viewMatch);if(!m)return;
   const d=modelData(m,allRecs().filter(r=>!(r.src==="m"&&r.id===m.id)),MDN);
   const set=(id,v)=>{$(id).value=v};set("#pHn",d.hn||10);set("#pHg",d.hg);set("#pHk",d.hk);set("#pAn",d.an||10);set("#pAg",d.ag);set("#pAk",d.ak);set("#pLn",d.ln||100);set("#pLg",d.lg);set("#pLk",d.lk);
-  const pl=parseLine(m.line,m.home,m.away);if(pl.body){$("#evGiver").value=pl.body.giver;$("#evBall").value=pl.body.ball;$("#evPrice").value=pl.body.price}
+  const pl=flqPL(m);if(pl.body){$("#evGiver").value=pl.body.giver;$("#evBall").value=pl.body.ball;$("#evPrice").value=pl.body.price}
   location.hash="poisson";setTimeout(pTotals,50)});
 
 /* collapsible boxes on matches page */
@@ -3007,18 +3007,20 @@ function mvApplyUI(){
 }
 
 /* ---------- list badges: ကြေးပြင်း/ပျော့ vs ပေါက်သင့် ---------- */
-const FLQ=new Map();let FLQR=null,FLQRK="";
+const FLQ=new Map(),FLQM=new Map();let FLQR=null,FLQRK="";
 function flqLine(m){const y=ahaDealerDefault();return (y&&dLine(m,y))||m.line||""}
-function flQuick(m){const t=flqLine(m);if(!t)return null;const rk=HC.key+"|"+S.matches.filter(x=>x.hg!=null).length+"|"+FLN;
-  const k=m.id+"|"+t+"|"+rk+"|"+m.hg+"-"+m.ag;if(FLQ.has(k))return FLQ.get(k);
+/* Yar ကြေး ဦးစား · Yar မှာ ဘော်ဒီ/ဂိုး မပါမှ Internet ကြေး */
+function flqPL(m){const y=ahaDealerDefault();const py=parseLine((y&&dLine(m,y))||"",m.home,m.away),pn=parseLine(m.line||"",m.home,m.away);return {body:py.body||pn.body,goal:py.goal||pn.goal}}
+function flQuick(m){const y=ahaDealerDefault();const t=((y&&dLine(m,y))||"")+"§"+(m.line||"");if(t==="§")return null;const rk=HC.key+"|"+S.matches.filter(x=>x.hg!=null).length+"|"+FLN;
+  const k=m.id+"|"+t+"|"+rk+"|"+m.hg+"-"+m.ag;if(FLQ.has(k)){FLQM.set(m.id,FLQ.get(k));return FLQ.get(k)}
   if(FLQRK!==rk){FLQR=allRecs();FLQRK=rk}
-  const recs=FLQR.filter(r=>!(r.src==="m"&&r.id===m.id));const pl=parseLine(t,m.home,m.away);let o=null;
+  const recs=FLQR.filter(r=>!(r.src==="m"&&r.id===m.id));const pl=flqPL(m);let o=null;
   try{const c=fairCalc(m,recs,FLN);o={};
     if(pl.body&&c.fair!=null){const g=pl.body.giver;const cur=200*pl.body.ball-pl.body.price;const d=cur-(g==="home"?c.fair:-c.fair);let r=null;
       if(m.hg!=null){const mg=(g==="home"?m.hg-m.ag:m.ag-m.hg)-pl.body.ball;r=mg>=1?1:mg<=-1?-1:pl.body.price/100}o.b={d:Math.round(d),r}}
     if(pl.goal&&c.fairG!=null){const cur=200*pl.goal.ball-pl.goal.price;const d=cur-c.fairG;let r=null;
       if(m.hg!=null){const mg=m.hg+m.ag-pl.goal.ball;r=mg>=1?1:mg<=-1?-1:pl.goal.price/100}o.g={d:Math.round(d),r}}}catch(e){o=null}
-  FLQ.set(k,o);return o}
+  FLQ.set(k,o);FLQM.set(m.id,o);return o}
 function flqRes(r){return r==null?"":r>0?` <span class="flq-r win">${r>=1?"✓":"½✓"}</span>`:r<0?` <span class="flq-r loss">${r<=-1?"✗":"½✗"}</span>`:` <span class="flq-r">=</span>`}
 function flqHtml(x,goal){if(!x)return '<span class="muted">—</span>';const a=Math.abs(x.d);
   const lab=a<20?["push","သင့်"]:goal?(x.d>0?["loss","မြင့် "+a]:["win","နိမ့် "+a]):(x.d>0?["loss","ပြင်း "+a]:["win","ပျော့ "+a]);
@@ -3032,7 +3034,7 @@ function flqFill(){const tok=++FLQT;const els=[...document.querySelectorAll("#ma
       const dr=e.dataset.day;}
     if(i<els.length)setTimeout(step,0);else flqDays()};setTimeout(step,30)}
 function flqDays(){document.querySelectorAll("#matchList tr.dayrow").forEach(tr=>{const d=tr.dataset.day;const ms=S.matches.filter(m=>mBiz(m)===d);let p=0,s=0,hi=0,lo=0;
-  ms.forEach(m=>{const k=[...FLQ.keys()].find(x=>x.startsWith(m.id+"|"));const q=k?FLQ.get(k):null;if(!q)return;if(q.b){if(q.b.d>=20)p++;else if(q.b.d<=-20)s++}if(q.g){if(q.g.d>=20)hi++;else if(q.g.d<=-20)lo++}});
+  ms.forEach(m=>{const q=FLQM.get(m.id);if(!q)return;if(q.b){if(q.b.d>=20)p++;else if(q.b.d<=-20)s++}if(q.g){if(q.g.d>=20)hi++;else if(q.g.d<=-20)lo++}});
   let sp=tr.querySelector(".flq-day");if(!sp){sp=document.createElement("span");sp.className="flq-day small";tr.querySelector("td").appendChild(sp)}
   sp.innerHTML=(p||s||hi||lo)?` · ဘော်ဒီ <span class="chip loss">ပြင်း ${p}</span> <span class="chip win">ပျော့ ${s}</span> · ဂိုး <span class="chip loss">မြင့် ${hi}</span> <span class="chip win">နိမ့် ${lo}</span>`:""})}
 
