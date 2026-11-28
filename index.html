@@ -509,10 +509,10 @@ section.view svg{max-width:100%;height:auto}
       </div>
       <div class="row"><button class="primary" type="submit" id="mSave">မှတ်မည်</button><button class="ghost" type="button" id="mCancel" hidden>ပယ်ဖျက်</button><span class="small" id="mErr" style="color:var(--loss)"></span></div>
     </form></details>
-    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v28/11 18:00</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
+    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v28/11 18:30</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
     <div class="box-body" style="display:grid;gap:10px">
       <textarea id="vbText" rows="6" placeholder="Yar Win Soe ဆီက Viber စာကို ဒီမှာ Paste ချပါ&#10;ဥပမာ:&#10;9:45&#10;Racing vs Sociedad&#10;Sociedad -80/3-90&#10;Bilbao vs Espanyol Bilbao 1-30/3+20&#10;Change A Villa 1+50/3+40 Spur 1-10/3-20&#10;Hull vs Brighton 1(-32)A 3(50)u"></textarea>
-      <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option><option value="bet">🎯 ထိုးစာရင်း</option></select><select id="vbDealer" style="width:auto" hidden title="ဒိုင်နာမည် မပါတဲ့ ထိုးစာ (ဥပမာ Racing 30000) အတွက် ဒိုင်"></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><label class="chk small" title="ကြေး/ရလဒ် မထည့်မိခဲ့တဲ့ ရက်ဟောင်းပွဲတွေပါ ရှာမယ်"><input type="checkbox" id="vbOld"> ရက် ၃၀ အတွင်း ပွဲဟောင်းပါ</label><button type="button" class="ghost" id="rsCopy" title="ရလဒ် မထည့်ရသေးတဲ့ ကန်ပြီးပွဲတွေကို ChatGPT အတွက် Copy ကူး">📤 ရလဒ်လိုတဲ့ပွဲ Copy</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
+      <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option><option value="bet">🎯 ထိုးစာရင်း</option></select><select id="vbDealer" style="width:auto" hidden title="ဒိုင်နာမည် မပါတဲ့ ထိုးစာ (ဥပမာ Racing 30000) အတွက် ဒိုင်"></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><label class="chk small" title="ကြေး/ရလဒ် မထည့်မိခဲ့တဲ့ ရက်ဟောင်းပွဲတွေပါ ရှာမယ်"><input type="checkbox" id="vbOld"> ရက် ၃၀ အတွင်း ပွဲဟောင်းပါ</label><button type="button" class="ghost" id="rsClean" title="ChatGPT ရလဒ်မပေးတဲ့ ပွဲတွေကို ရလဒ်မလို လို့ မှတ်/ဖျက်">🧹 ရလဒ်မရ ပွဲ</button><button type="button" class="ghost" id="rsCopy" title="ရလဒ် မထည့်ရသေးတဲ့ ကန်ပြီးပွဲတွေကို ChatGPT အတွက် Copy ကူး">📤 ရလဒ်လိုတဲ့ပွဲ Copy</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
       <div id="vbPrev"></div>
     </div></details>
     <div class="row small" id="mvLineTg" style="gap:6px;align-items:center;margin:0 0 8px"><span class="muted">ကြေး ကော်လံ ပြ:</span><button type="button" class="tg" data-tg="net">Internet</button><button type="button" class="tg" data-tg="yws">Yar Win Soe</button><span class="muted"><span class="betfill-key"></span> = ထိုးထား</span></div>
@@ -1021,7 +1021,7 @@ const MKT={body:"ဘော်ဒီ",goal:"ဂိုးပေါင်း",x12:"
 /* ---------- store: db capability + offline cache & write queue ---------- */
 const S={bets:[],dealers:[],payments:[],settings:[],matches:[],history:[],mode:"loading"};
 const COLS=["bets","dealers","payments","settings","matches","history"];
-const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="28/11 18:00";
+const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="28/11 18:30";
 const FB_CFG={apiKey:"AIzaSyCowWBBUMnp03gAxASeN-fWi_65XXHvL2o",authDomain:"cwp-ledger.firebaseapp.com",projectId:"cwp-ledger",storageBucket:"cwp-ledger.firebasestorage.app",messagingSenderId:"595192435834",appId:"1:595192435834:web:95d9892b256e44d26657c3"};const FB_UID="PtPXmvY7sZPUCX70XPLWHWqEqkb2";let FS=null;
 const SIMPLE=false;document.documentElement.classList.toggle("simple",SIMPLE);
 let db=null;const LS="kyay-ledger-v1",LC="kyay-cache-v1",LQ="kyay-queue-v1";
@@ -2104,7 +2104,7 @@ function renderAha(){
   const dn=dealerName(did);$$(".ahaDn").forEach(x=>x.textContent=dn);
   const BL=blocked();const T=+AHA.T||20;
   const day=AHA.day==="today"?today():AHA.day==="tomorrow"?dayOff(1):"";
-  let ms=S.matches.filter(m=>m.hg==null&&!BL.has(m.league)&&mStatus(m)!=="await"&&(!day||m.date===day||(AHA.day==="today"&&m.date===dayOff(1)&&(m.time||"")<"10:00")));
+  let ms=S.matches.filter(m=>m.hg==null&&!BL.has(m.league)&&!["await","skip"].includes(mStatus(m))&&(!day||m.date===day||(AHA.day==="today"&&m.date===dayOff(1)&&(m.time||"")<"10:00")));
   if(AHA.q){const q=normTeam(AHA.q);ms=ms.filter(m=>normTeam(m.home).includes(q)||normTeam(m.away).includes(q)||normTeam(m.league).includes(q))}
   ms.sort((a,b)=>((a.date||"")+(a.time||"")).localeCompare((b.date||"")+(b.time||"")));
   const waiting=ms.filter(m=>!dLine(m,did)).length;
@@ -2171,7 +2171,7 @@ function legDone(m,src,mk){return S.bets.find(b=>b.matchId===m.id&&b.market===mk
 function legLine(m,src){return src==="net"?m.line:dLine(m,src)}
 function ahaLegs(did,T){
   const BL=blocked();const out=[];
-  S.matches.filter(m=>m.hg==null&&!BL.has(m.league)&&dLine(m,did)&&mStatus(m)!=="await").forEach(m=>{const c=ahaCalc(m,did,T);
+  S.matches.filter(m=>m.hg==null&&!BL.has(m.league)&&dLine(m,did)&&!["await","skip"].includes(mStatus(m))).forEach(m=>{const c=ahaCalc(m,did,T);
     if(c.body&&c.body.hit){out.push({m,src:"net",mk:"body",pick:c.body.netPick,pl:c.a,d:c.body.d});out.push({m,src:did,mk:"body",pick:c.body.dlrPick,pl:c.b,d:c.body.d})}
     if(c.goal&&c.goal.hit){out.push({m,src:"net",mk:"goal",pick:c.goal.netPick,pl:c.a,d:c.goal.d});out.push({m,src:did,mk:"goal",pick:c.goal.dlrPick,pl:c.b,d:c.goal.d})}});
   out.sort((a,b)=>((a.m.date||"")+(a.m.time||"")).localeCompare((b.m.date||"")+(b.m.time||"")));return out;
@@ -2943,7 +2943,7 @@ $("#lgcOpenAll").addEventListener("click",()=>{$$("#lgcList details.lgc").forEac
 $("#lgcCloseAll").addEventListener("click",()=>{LGC_OPEN.clear();$$("#lgcList details.lgc").forEach(d=>d.open=false)});
 function renderNoLine(){
   const el=$("#noLineBox");if(!el)return;const bl=blocked();
-  const list=S.matches.filter(m=>m.hg==null&&!bl.has(m.league)&&!(m.line||"").trim()&&!m.nlHide&&mStatus(m)!=="await").sort((a,b)=>((a.date||"")+(a.time||"")).localeCompare((b.date||"")+(b.time||"")));
+  const list=S.matches.filter(m=>m.hg==null&&!bl.has(m.league)&&!(m.line||"").trim()&&!m.nlHide&&!["await","skip"].includes(mStatus(m))).sort((a,b)=>((a.date||"")+(a.time||"")).localeCompare((b.date||"")+(b.time||"")));
   if(!list.length){el.hidden=true;return}
   el.hidden=false;
   el.innerHTML=`<details${BOX.noLine===false?"":" open"} id="noLineDet"><summary><b>⚠ မြန်မာကြေး မပါသေးတဲ့ ပွဲ ${list.length} ပွဲ</b> <span class="small">· ကြေးထည့်ရန် နှိပ်ပါ</span> <button type="button" class="ghost small" data-nl="hideAll">အကုန် ပိတ်မည်</button></summary>
@@ -2970,12 +2970,12 @@ function bizShift(d,n){const x=new Date(d+"T00:00:00Z");x.setUTCDate(x.getUTCDat
 function betDay(ts){const d=new Date(ts||Date.now());const p=n=>String(n).padStart(2,"0");return bizDate(`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`,`${p(d.getHours())}:${p(d.getMinutes())}`)}
 function kickTs(m){const t=new Date((m.date||"")+"T"+(m.time||"00:00")).getTime();return isFinite(t)?t:null}
 function mStatus(m){
-  if(m.hg!=null)return "done";
+  if(m.hg!=null&&m.hg!=="")return "done";if(m.noRes)return "skip";
   const k=kickTs(m);const now=Date.now();
   if(!m.time){const td=today();return m.date>td?"up":m.date<td?"await":"up"}
   if(k==null)return "up";if(now<k)return "up";if(now<k+MATCH_MIN*60000)return "live";return "await";
 }
-const ST_LAB={up:'<span class="chip ex">မကန်သေး</span>',live:'<span class="chip live">● ကန်နေဆဲ</span>',await:'<span class="chip push">ရလဒ်ထည့်ရန်</span>',done:'<span class="chip win">ပြီး</span>'};
+const ST_LAB={up:'<span class="chip ex">မကန်သေး</span>',live:'<span class="chip live">● ကန်နေဆဲ</span>',await:'<span class="chip push">ရလဒ်ထည့်ရန်</span>',skip:'<span class="chip ex" title="ရလဒ်မလိုလို့ မှတ်ထား">ရလဒ်မလို</span>',done:'<span class="chip win">ပြီး</span>'};
 function liveMinute(m){const k=kickTs(m);if(k==null)return "";const mi=Math.floor((Date.now()-k)/60000);return mi<=45?mi+"'":mi<=60?"HT":Math.min(90,mi-15)+"'"}
 function dayOff(n){const d=new Date(today()+"T12:00");d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
 function mvApplyUI(){
@@ -3382,7 +3382,7 @@ function rsRender(){const el=$("#vbPrev");if(!VB.length){el.innerHTML='<p class=
 async function rsApply(){let n=0,nb=0,tot=0;
   for(const [i,x] of VB.entries()){const cb=$("#vbPrev").querySelector(`[data-vbon="${i}"]`);if(!cb||!cb.checked||!x.ok)continue;
     const m=S.matches.find(z=>z.id===x.m.id);if(!m)continue;if(m.hg!=null&&m.hg!==""&&S.bets.some(b=>b.matchId===m.id&&b.clearedId))continue;
-    await put("matches",Object.assign({},m,{hg:x.H,ag:x.A}));n++;
+    const nm2=Object.assign({},m,{hg:x.H,ag:x.A});delete nm2.noRes;await put("matches",nm2);n++;
     for(const b of S.bets.filter(b=>b.matchId===m.id&&!b.clearedId)){const o=Object.assign({},b,{hg:x.H,ag:x.A,settledAt:Date.now()});await put("bets",o);nb++;tot+=settle(o).net}}
   toast(`ရလဒ် ${n} ပွဲ ထည့်ပြီး${nb?` · ထိုး ${nb} ခု တွက်ပြီး: ${fmtS(tot)}`:""}`);VB=rsParse($("#vbText").value);rsRender()}
 function vbCur(m,src){return (src||$("#vbTarget").value)==="net"?(m.line||""):dLine(m,ywsId())}
@@ -3413,8 +3413,23 @@ $("#vbCheck").addEventListener("click",()=>{vbAutoTarget();btDealerFill();if(isB
 $("#vbOld").addEventListener("change",()=>$("#vbTarget").dispatchEvent(new Event("change")));
 $("#vbDealer").addEventListener("change",()=>{try{localStorage.setItem("kyay-vbdealer",$("#vbDealer").value)}catch(e){}if(isBet()&&$("#vbText").value.trim()){VB=btParse($("#vbText").value);btRender()}});
 $("#vbTarget").addEventListener("change",()=>{btDealerFill();try{localStorage.setItem("kyay-vbtgt",$("#vbTarget").value)}catch(e){}$("#vbPrev").innerHTML="";if(!$("#vbText").value.trim()){VB=[];return}if(isBet()){VB=btParse($("#vbText").value);btRender()}else if(isRes()){VB=rsParse($("#vbText").value);rsRender()}else{VB=vbParse($("#vbText").value);vbRender()}});
+
+/* ---- ရလဒ်မရ ပွဲ ရှင်း ---- */
+let RC=[];
+function rcRender(){const now=Date.now();RC=S.matches.filter(m=>(m.hg==null||m.hg==="")&&!m.noRes&&(()=>{const k=kickTs(m);return k!=null&&k<now-115*60e3&&k>now-31*864e5})()).sort((a,b)=>(a.date+(a.time||"")).localeCompare(b.date+(b.time||"")));
+  const el=$("#vbPrev");if(!RC.length){el.innerHTML='<p class="small muted">ရလဒ် ထည့်ရန် ကျန်တဲ့ပွဲ မရှိပါ ✓</p>';return}
+  el.innerHTML=`<p class="small">ChatGPT က ရလဒ် ရှာမတွေ့တဲ့ ပွဲတွေ (ပွဲရွှေ့/ပွဲပျက်၊ League အသေး၊ အချိန်မှား) — <b>ရလဒ်မလို</b> လို့ မှတ်ရင် "ရလဒ်ထည့်ရန်" စာရင်းနဲ့ Copy စာရင်းထဲ မပါတော့ပါ။ ထိုးစာရင်းရှိတဲ့ပွဲကိုတော့ မဖျက်နိုင်ပါ။</p>
+  <table class="mini hedge" style="width:100%"><thead><tr><th><input type="checkbox" id="rcAll" checked></th><th>ရက်/အချိန်</th><th>ပြိုင်ပွဲ</th><th>ပွဲ</th><th>ထိုး</th></tr></thead><tbody>${RC.map((m,i)=>{const nb=S.bets.filter(b=>b.matchId===m.id).length;return `<tr><td><input type="checkbox" data-rc="${i}" ${nb?"":"checked"}></td><td class="small nowrap">${esc(ddmm(m.date))} ${esc(m.time||"")}</td><td class="small">${esc(m.league||"")}</td><td>${vsH(m.home,m.away,mGiver(m))}</td><td>${nb?`<span class="chip win">${nb}</span>`:'<span class="muted">—</span>'}</td></tr>`}).join("")}</tbody></table>
+  <div class="row" style="margin-top:8px;gap:8px"><button type="button" class="primary" id="rcSkip">✓ ရလဒ်မလို လို့ မှတ်မည်</button><button type="button" class="danger ghost" id="rcDel">🗑 ဖျက်မည် (ထိုးစာရင်းမရှိတာသာ)</button><span class="small muted">${RC.length} ပွဲ</span></div>`}
+$("#rsClean").addEventListener("click",()=>{VB=[];rcRender()});
+$("#vbPrev").addEventListener("change",e=>{if(e.target.id==="rcAll")$$("#vbPrev [data-rc]").forEach(c=>c.checked=e.target.checked)});
+$("#vbPrev").addEventListener("click",async e=>{const b=e.target.closest("#rcSkip,#rcDel");if(!b)return;const sel=$$("#vbPrev [data-rc]").filter(c=>c.checked).map(c=>RC[+c.dataset.rc]).filter(Boolean);if(!sel.length){toast("ပွဲ ရွေးပါ");return}
+  b.disabled=true;let n=0;
+  if(b.id==="rcSkip"){for(const m of sel){await put("matches",Object.assign({},m,{noRes:true}));n++}toast(`${n} ပွဲ ရလဒ်မလို လို့ မှတ်ပြီး`)}
+  else{const ok=sel.filter(m=>!S.bets.filter(b=>b.matchId===m.id).length);if(!confirmBox(`ထိုးစာရင်းမရှိတဲ့ ${ok.length} ပွဲကို ဖျက်မယ်။ ပြန်ယူလို့ မရပါ။`)){b.disabled=false;return}for(const m of ok){await del("matches",m.id);n++}toast(`${n} ပွဲ ဖျက်ပြီး`)}
+  rcRender()});
 $("#rsCopy").addEventListener("click",async()=>{const now=Date.now();
-  const L=rsCands().filter(m=>(m.hg==null||m.hg==="")&&kickTs(m)<now-115*60e3).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  const L=rsCands().filter(m=>(m.hg==null||m.hg==="")&&!m.noRes&&kickTs(m)<now-115*60e3).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
   if(!L.length){toast("ရလဒ် လိုတဲ့ ကန်ပြီးပွဲ မရှိပါ");return}
   const t="results\n"+L.map(m=>`${m.home} vs ${m.away} (${ddmm(m.date)} ${m.time||""} Myanmar time, ${m.league||""})`).join("\n");
   let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(e){}
