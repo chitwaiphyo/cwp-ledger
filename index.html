@@ -509,7 +509,7 @@ section.view svg{max-width:100%;height:auto}
       </div>
       <div class="row"><button class="primary" type="submit" id="mSave">မှတ်မည်</button><button class="ghost" type="button" id="mCancel" hidden>ပယ်ဖျက်</button><span class="small" id="mErr" style="color:var(--loss)"></span></div>
     </form></details>
-    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v28/11 21:40</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
+    <details class="box" data-fold="vb" id="vbBox"><summary class="box-h"><span>📋 Viber / စာ ကူးထည့် (ကြေး · ရလဒ် · ထိုးစာရင်း အလိုလို ဝင်) <span class="small muted">· v28/11 22:10</span></span><span class="box-arrow" aria-hidden="true"></span></summary>
     <div class="box-body" style="display:grid;gap:10px">
       <textarea id="vbText" rows="6" placeholder="Yar Win Soe ဆီက Viber စာကို ဒီမှာ Paste ချပါ&#10;ဥပမာ:&#10;9:45&#10;Racing vs Sociedad&#10;Sociedad -80/3-90&#10;Bilbao vs Espanyol Bilbao 1-30/3+20&#10;Change A Villa 1+50/3+40 Spur 1-10/3-20&#10;Hull vs Brighton 1(-32)A 3(50)u"></textarea>
       <div class="row"><select id="vbTarget" style="width:auto"><option value="yws">Yar Win Soe ကြေး</option><option value="net">Internet ကြေး</option><option value="res">⚽ ပွဲပြီး ရလဒ်</option><option value="bet">🎯 ထိုးစာရင်း</option></select><select id="vbDealer" style="width:auto" hidden title="ဒိုင်နာမည် မပါတဲ့ ထိုးစာ (ဥပမာ Racing 30000) အတွက် ဒိုင်"></select><button type="button" class="primary" id="vbCheck">စစ်မည်</button><button type="button" class="ghost" id="vbClear">ရှင်းမည်</button><label class="chk small" title="ကြေး/ရလဒ် မထည့်မိခဲ့တဲ့ ရက်ဟောင်းပွဲတွေပါ ရှာမယ်"><input type="checkbox" id="vbOld"> ရက် ၃၀ အတွင်း ပွဲဟောင်းပါ</label><button type="button" class="ghost" id="rsClean" title="ChatGPT ရလဒ်မပေးတဲ့ ပွဲတွေကို ရလဒ်မလို လို့ မှတ်/ဖျက်">🧹 ရလဒ်မရ ပွဲ</button><button type="button" class="ghost" id="rsCopy" title="ရလဒ် မထည့်ရသေးတဲ့ ကန်ပြီးပွဲတွေကို ChatGPT အတွက် Copy ကူး">📤 ရလဒ်လိုတဲ့ပွဲ Copy</button><span class="small muted">ပွဲနာမည် ကိုက်တာကို စစ်ပြီးမှ ထည့်ပါမယ်</span></div>
@@ -1021,7 +1021,7 @@ const MKT={body:"ဘော်ဒီ",goal:"ဂိုးပေါင်း",x12:"
 /* ---------- store: db capability + offline cache & write queue ---------- */
 const S={bets:[],dealers:[],payments:[],settings:[],matches:[],history:[],mode:"loading"};
 const COLS=["bets","dealers","payments","settings","matches","history"];
-const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="28/11 21:40";
+const STANDALONE=/*STANDALONE*/false;const FIREBASE=/*FIREBASE*/true;const APP_VER="28/11 22:10";
 const FB_CFG={apiKey:"AIzaSyCowWBBUMnp03gAxASeN-fWi_65XXHvL2o",authDomain:"cwp-ledger.firebaseapp.com",projectId:"cwp-ledger",storageBucket:"cwp-ledger.firebasestorage.app",messagingSenderId:"595192435834",appId:"1:595192435834:web:95d9892b256e44d26657c3"};const FB_UID="PtPXmvY7sZPUCX70XPLWHWqEqkb2";let FS=null;
 const SIMPLE=false;document.documentElement.classList.toggle("simple",SIMPLE);
 let db=null;const LS="kyay-ledger-v1",LC="kyay-cache-v1",LQ="kyay-queue-v1";
@@ -3288,12 +3288,18 @@ function vbParse(text){const out=[];let hint=null,pair=null;
     if(m&&x.date&&m.date!==x.date&&mBiz(m)!==bizDate(x.date,x.hint||"12:00")){const C2=S.matches.filter(z=>z.date===x.date);const m2=x.home?vbFind(x.home,x.away,x.hint,C2):null;m=m2||null}
     const b=normLine(vbLine(x.body)),g=x.goal?normLine(vbLine(x.goal)):"";
     let side=null;if(m){side=x.forceSide||(x.giver?vbGiverSide(m,x.giver):"home")}
+    if(!m&&x.home&&x.away&&!x.date&&x.hint){const t=yar24(x.hint);const base=betDay(Date.now());x.hint=t;x.date=t<"10:00"?bizShift(base,1):base;x.guess=true;if(!x.league)x.league=guessLg(x.home)||guessLg(x.away)||""}
     const nw=!m&&!!x.home&&!!x.away&&!!x.date;
     return Object.assign(x,{m,side,b,g,nw,ok:(!!m||nw)&&b!=null&&b!==""&&g!=null})})}
 const vbTgt=x=>(x&&x.src)||$("#vbTarget").value;
+/* Yar times are 12-hour without AM/PM: 1–4 = after midnight, 5–11 = evening, 12 = midnight */
+function yar24(hm){const [h,mm]=String(hm).split(":").map(Number);if(isNaN(h))return hm;let H=h;if(h>=13||h===0)H=h;else if(h===12)H=0;else if(h>=5)H=h+12;return String(H).padStart(2,"0")+":"+String(mm||0).padStart(2,"0")}
+function guessLg(t){try{const k=teamKey(t);const c={};let n=0;for(const r of allRecs()){if(teamKey(r.home)!==k&&teamKey(r.away)!==k)continue;if(r.league&&!/uefa|cup|pokal|copa|coppa|coupe|friendl|super cup|shield|trophy|champions|europa|conference/i.test(r.league))c[r.league]=(c[r.league]||0)+1;if(++n>=30)break}
+  const L=Object.keys(c).sort((a,b)=>c[b]-c[a]);return L[0]||""}catch(e){return ""}}
 function vbFix(m,x){if(!m||!x.date||!x.hint)return null;const o={};if(m.time!==x.hint)o.time=x.hint;if(m.date!==x.date)o.date=x.date;if(x.league&&!m.league)o.league=x.league;
   if(m.hg!=null&&m.hg!=="")return null;return Object.keys(o).length?o:null}
-function vbNewM(x){return {id:uid("m_"),createdAt:Date.now(),date:x.date,time:x.hint||"",league:x.league||"",home:x.home.trim(),away:x.away.trim(),hg:null,ag:null,line:"",lines:[],dl:{},note:""}}
+function canonName(t){t=String(t||"").trim();try{const T=hcTeams();const k=teamKey(t);return T.cnt.get(k)>=3?T.name(k):t}catch(e){return t}}
+function vbNewM(x){return {id:uid("m_"),createdAt:Date.now(),date:x.date,time:x.hint||"",league:x.league||"",home:canonName(x.home),away:canonName(x.away),hg:null,ag:null,line:"",lines:[],dl:{},note:""}}
 let VB=[];
 
 /* ---- ထိုးစာရင်း paste: ACC | [HH:MM] Home vs Away | PICK | LINE | UNITS [| live H-A] ---- */
@@ -3409,7 +3415,7 @@ function vbRender(){const el=$("#vbPrev");if(!VB.length){el.innerHTML='<p class=
     let m=x.m;const nm=!m&&x.nw?vbNewM(x):null;if(nm)x.side=x.forceSide||(x.giver?vbGiverSide(nm,x.giver):"home");const mm=m||nm;
     const line=mm&&x.ok?vbMake(mm,x):"";const cur=m&&vbCur(m,vbTgt(x));const T=vbTgt(x);
     const fx=vbFix(m,x);
-    return `<tr><td class="small"><span class="chip ${T==="net"?"":"ex"}">${T==="net"?"Internet":"Yar"}</span> ${esc(x.raw)}</td><td>${m?`${esc(ddmm(m.date))} ${esc(m.time||"")} <b>${vsH(m.home,m.away,x.side||mGiver(m))}</b>${fx?`<br><span class="chip warn">🕒 ပြင်မည်: ${fx.date?esc(ddmm(fx.date))+" ":""}${fx.time?esc(m.time||"?")+" → "+esc(fx.time):""}${fx.league?" · "+esc(fx.league):""}</span>`:""}`:nm?`<span class="chip win">➕ ပွဲသစ်</span> ${esc(ddmm(nm.date))} ${esc(nm.time)} ${nm.league?`<span class="small muted">${esc(nm.league)}</span> `:""}<b>${vsH(nm.home,nm.away,x.side)}</b>`:'<span class="chip loss">ပွဲ မတွေ့</span>'}<br><select data-vbm="${i}" style="width:auto;max-width:100%;padding:3px 6px;margin-top:3px"><option value="">— ပွဲ ရွေးရန် —</option>${opts}</select></td>
+    return `<tr><td class="small"><span class="chip ${T==="net"?"":"ex"}">${T==="net"?"Internet":"Yar"}</span> ${esc(x.raw)}</td><td>${m?`${esc(ddmm(m.date))} ${esc(m.time||"")} <b>${vsH(m.home,m.away,x.side||mGiver(m))}</b>${fx?`<br><span class="chip warn">🕒 ပြင်မည်: ${fx.date?esc(ddmm(fx.date))+" ":""}${fx.time?esc(m.time||"?")+" → "+esc(fx.time):""}${fx.league?" · "+esc(fx.league):""}</span>`:""}`:nm?`<span class="chip win">➕ ပွဲသစ်</span>${x.guess?' <span class="chip warn" title="Yar စာမှာ ရက်စွဲ/League မပါလို့ ခန့်မှန်းထားတာ — မှားရင် ပွဲစဉ်မှာ ပြင်ပါ">ရက်·အချိန်·League ခန့်မှန်း</span>':""} ${esc(ddmm(nm.date))} ${esc(nm.time)} ${nm.league?`<span class="small muted">${esc(nm.league)}</span> `:""}<b>${vsH(nm.home,nm.away,x.side)}</b>`:'<span class="chip loss">ပွဲ မတွေ့</span>'}<br><select data-vbm="${i}" style="width:auto;max-width:100%;padding:3px 6px;margin-top:3px"><option value="">— ပွဲ ရွေးရန် —</option>${opts}</select></td>
       <td>${line?`<span class="line-tag">${esc(padL(line))}</span>${cur?`<br><span class="small muted">ယခု: ${esc(padL(cur))}${padL(cur)===padL(line)?" (တူ)":""}</span>`:""}`:(x.b==null||x.b===""||x.g==null?'<span class="chip loss">ကြေး ပုံစံ မှား</span>':"")}</td>
       <td><input type="checkbox" data-vbon="${i}" ${x.ok&&(padL(cur)!==padL(line)||fx)?"checked":""} ${x.ok?"":"disabled"}></td></tr>`}).join("")}</tbody></table>
     <div class="row" style="margin-top:8px"><button type="button" class="primary" id="vbApply">✓ ရွေးထားတာ ထည့်မည်</button><span class="small muted">${VB.filter(x=>x.ok).length}/${VB.length} ကြောင်း · Yar ${VB.filter(x=>vbTgt(x)==="yws").length} · Internet ${VB.filter(x=>vbTgt(x)==="net").length}${VB.some(x=>x.nw&&!x.m)?` · ➕ ပွဲသစ် ${VB.filter(x=>x.nw&&!x.m).length}`:""}</span></div>`;
